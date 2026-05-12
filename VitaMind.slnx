@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="ConsumeCRUD/ConsumeCRUD.csproj" Id="b7438bcd-7778-4a47-aff8-9b6c59b24c8e" />
+  <Project Path="VitaMind.Apii/VitaMind.Apii.csproj" Id="a01459b1-ad77-4096-8172-e57e680f16ee" />
+  <Project Path="VitaMind.MVC/VitaMind.MVC.csproj" Id="55607bc3-c19d-4644-ab30-486df9b3e8f6" />
+  <Project Path="VitaMind/VitaMind.Models.csproj" />
+</Solution>

@@ -1,0 +1,41 @@
+﻿@{
+    ViewData["Title"] = "Agente Conversacional";
+}
+
+<div class="container mt-4">
+    <h2>Agente Conversacional VitaMind</h2>
+
+    <div class="alert alert-info">
+        Puedes consultar información sobre tus registros. El agente no realiza diagnósticos médicos.
+    </div>
+
+    <form asp-controller="Chatbot" asp-action="Preguntar" method="post">
+
+        <div class="mb-3">
+            <label class="form-label">Pregunta</label>
+            <textarea name="pregunta" class="form-control" rows="4"
+                      placeholder="Ejemplo: ¿Cuántos registros he ingresado?"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Preguntar
+        </button>
+
+        <a asp-controller="Cliente" asp-action="Index" class="btn btn-secondary">
+            Volver
+        </a>
+    </form>
+
+    @if (ViewBag.Respuesta != null)
+    {
+        <div class="card mt-4 shadow-sm">
+            <div class="card-header">
+                Respuesta del agente
+            </div>
+            <div class="card-body">
+                <p><strong>Pregunta:</strong> @ViewBag.Pregunta</p>
+                <p><strong>Respuesta:</strong> @ViewBag.Respuesta</p>
+            </div>
+        </div>
+    }
+</div>

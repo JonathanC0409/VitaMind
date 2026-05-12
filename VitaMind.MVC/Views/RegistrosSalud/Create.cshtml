@@ -1,0 +1,66 @@
+﻿@model VitaMind.Models.RegistroSalud
+
+@{
+    ViewData["Title"] = "Nuevo Registro de Salud";
+}
+
+<div class="container mt-4">
+    <h2>Nuevo Registro de Salud</h2>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.Error
+        </div>
+    }
+
+    <div class="alert alert-warning">
+        VitaMind no realiza diagnósticos médicos. La información registrada es solo para seguimiento personal.
+    </div>
+
+    <form asp-controller="RegistrosSalud" asp-action="Create" method="post">
+
+        <div class="mb-3">
+            <label class="form-label">Categoría</label>
+            <select asp-for="Categoria" class="form-control" required>
+                <option value="">Seleccione una categoría</option>
+                <option value="Sueño">Sueño</option>
+                <option value="Hidratación">Hidratación</option>
+                <option value="Alimentación">Alimentación</option>
+                <option value="Ejercicio">Ejercicio</option>
+                <option value="Síntomas">Síntomas</option>
+                <option value="Estado emocional">Estado emocional</option>
+                <option value="Hábitos generales">Hábitos generales</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea asp-for="Descripcion" class="form-control" rows="4" required
+                      placeholder="Ejemplo: Dormí 5 horas y amanecí cansado."></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Intensidad</label>
+            <select asp-for="Intensidad" class="form-control">
+                <option value="">Seleccione intensidad</option>
+                <option value="Baja">Baja</option>
+                <option value="Media">Media</option>
+                <option value="Alta">Alta</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Observación</label>
+            <textarea asp-for="Observacion" class="form-control" rows="3"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Guardar registro
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Cancelar
+        </a>
+    </form>
+</div>

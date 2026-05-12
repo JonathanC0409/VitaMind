@@ -1,0 +1,29 @@
+﻿@model VitaMind.Models.RegistroSalud
+
+@{
+    ViewData["Title"] = "Detalle Registro";
+}
+
+<div class="container mt-4">
+    <h2>Detalle del Registro</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <p><strong>Categoría:</strong> @Model.Categoria</p>
+            <p><strong>Descripción:</strong> @Model.Descripcion</p>
+            <p><strong>Intensidad:</strong> @Model.Intensidad</p>
+            <p><strong>Observación:</strong> @Model.Observacion</p>
+            <p><strong>Fecha:</strong> @Model.FechaRegistro.ToShortDateString()</p>
+            <p><strong>Estado:</strong> @Model.EstadoInsercion</p>
+            <p><strong>Latencia:</strong> @Model.LatenciaMs ms</p>
+            <p><strong>Dimensión embedding:</strong> @Model.DimensionEmbedding</p>
+            <p><strong>Similitud detectada:</strong> @Model.SimilitudDetectada %</p>
+
+        </div>
+    </div>
+
+    <a asp-action="Index" class="btn btn-secondary mt-3">
+        Volver
+    </a>
+</div>

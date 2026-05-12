@@ -1,0 +1,52 @@
+﻿@{
+    ViewData["Title"] = "Panel Cliente";
+}
+
+<div class="container mt-4">
+    <h2>Panel del Cliente</h2>
+    <p>Bienvenido, <strong>@ViewBag.Nombre</strong></p>
+
+    <div class="row mt-4">
+
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Registrar salud</h5>
+                    <p>Ingresar hábitos, síntomas o estado emocional.</p>
+                    <a asp-controller="RegistrosSalud" asp-action="Create" class="btn btn-primary">
+                        Nuevo registro
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Mis registros</h5>
+                    <p>Consultar historial de registros personales.</p>
+                    <a asp-controller="RegistrosSalud" asp-action="Index" class="btn btn-success">
+                        Ver registros
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Agente conversacional</h5>
+                    <p>Consultar información mediante chatbot.</p>
+                    <a asp-controller="Chatbot" asp-action="Index" class="btn btn-info">
+                        Abrir chatbot
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <a asp-controller="Auth" asp-action="Logout" class="btn btn-outline-danger mt-3">
+        Cerrar sesión
+    </a>
+</div>

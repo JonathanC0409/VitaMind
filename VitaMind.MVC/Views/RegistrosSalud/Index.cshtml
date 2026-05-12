@@ -1,0 +1,64 @@
+﻿@model List<VitaMind.Models.RegistroSalud>
+
+@{
+    ViewData["Title"] = "Registros de Salud";
+}
+
+<div class="container mt-4">
+    <h2>Registros de Salud</h2>
+
+    <a asp-controller="RegistrosSalud" asp-action="Create" class="btn btn-primary mb-3">
+        Nuevo registro
+    </a>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">
+            No existen registros disponibles.
+        </div>
+    }
+    else
+    {
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Categoría</th>
+                    <th>Descripción</th>
+                    <th>Intensidad</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Latencia</th>
+                    <th>Similitud</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Categoria</td>
+                        <td>@item.Descripcion</td>
+                        <td>@item.Intensidad</td>
+                        <td>@item.FechaRegistro.ToShortDateString()</td>
+                        <td>@item.EstadoInsercion</td>
+                        <td>@item.LatenciaMs ms</td>
+                        <td>@item.SimilitudDetectada %</td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.IdRegistro" class="btn btn-sm btn-info">
+                                Ver
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.IdRegistro" class="btn btn-sm btn-danger">
+                                Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <a asp-controller="Cliente" asp-action="Index" class="btn btn-secondary">
+        Volver
+    </a>
+</div>

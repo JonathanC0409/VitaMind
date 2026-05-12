@@ -1,0 +1,89 @@
+﻿@{
+    ViewData["Title"] = "Dashboard Administrador";
+}
+
+<div class="container mt-4">
+    <h2>Dashboard Administrativo</h2>
+    <p>Bienvenido, <strong>@ViewBag.Nombre</strong></p>
+
+    <div class="row mt-4">
+
+        <div class="col-md-3 mb-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6>Total registros</h6>
+                    <h3>@ViewBag.TotalRegistros</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6>Total usuarios</h6>
+                    <h3>@ViewBag.TotalUsuarios</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6>Consultas agente</h6>
+                    <h3>@ViewBag.TotalConsultas</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6>Errores</h6>
+                    <h3>@ViewBag.Errores</h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row mt-3">
+
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6>Latencia promedio</h6>
+                    <p>@ViewBag.LatenciaPromedio ms</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6>Tasa de éxito</h6>
+                    <p>@ViewBag.TasaExito %</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6>Vectores almacenados</h6>
+                    <p>@ViewBag.Vectores</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="mt-4">
+        <a asp-controller="RegistrosSalud" asp-action="Index" class="btn btn-primary">
+            Ver registros
+        </a>
+
+        <a asp-controller="Auth" asp-action="Logout" class="btn btn-outline-danger">
+            Cerrar sesión
+        </a>
+    </div>
+</div>

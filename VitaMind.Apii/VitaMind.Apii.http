@@ -1,0 +1,6 @@
+@VitaMind.Apii_HostAddress = http://localhost:5291
+
+GET {{VitaMind.Apii_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
