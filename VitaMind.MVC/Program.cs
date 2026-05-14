@@ -1,11 +1,15 @@
 using VitaMind.Models;
+using VitaMind.MVC.Models;
 using ConsumeCRUD;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ENDPOINTS API
 CRUD<Usuario>.EndPoint = "https://localhost:7042/api/Usuarios";
+
 CRUD<RegistroSalud>.EndPoint = "https://localhost:7042/api/RegistrosSalud";
+
+
 CRUD<BusquedaSemantica>.EndPoint = "https://localhost:7042/api/BusquedaSemanticas";
 CRUD<ConsultaAgente>.EndPoint = "https://localhost:7042/api/ConsultaAgentes";
 CRUD<ErrorIngreso>.EndPoint = "https://localhost:7042/api/ErrorIngresos";
@@ -16,6 +20,9 @@ CRUD<ServicioEstado>.EndPoint = "https://localhost:7042/api/ServicioEstados";
 
 // Servicios MVC
 builder.Services.AddControllersWithViews();
+
+// Permite usar IHttpClientFactory en los controladores
+builder.Services.AddHttpClient();
 
 // Habilitar sesiones
 builder.Services.AddSession();
@@ -29,12 +36,10 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 
 app.UseRouting();
 
-// IMPORTANTE: va después de UseRouting y antes de UseAuthorization
 app.UseSession();
 
 app.UseAuthorization();

@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VitaMind.Models;
+using System.Diagnostics;
+using Pgvector;
+
 
 namespace VitaMind.Apii.Controllers
 {
@@ -81,35 +84,146 @@ namespace VitaMind.Apii.Controllers
         [HttpPost]
         public async Task<ActionResult<RegistroSalud>> PostRegistroSalud(RegistroSalud registroSalud)
         {
-            // Generar ID si viene vacío
-            if (registroSalud.IdRegistro == Guid.Empty)
+            var relojTotal = Stopwatch.StartNew();
+
+            try
             {
-                registroSalud.IdRegistro = Guid.NewGuid();
+                // Generar ID si viene vacío
+                if (registroSalud.IdRegistro == Guid.Empty)
+                {
+                    registroSalud.IdRegistro = Guid.NewGuid();
+                }
+
+                // Fechas en UTC para PostgreSQL
+                registroSalud.FechaRegistro = DateTime.UtcNow.Date;
+                registroSalud.HoraRegistro = DateTime.UtcNow.TimeOfDay;
+                registroSalud.FechaCreacion = DateTime.UtcNow;
+
+                // Valores por defecto
+                registroSalud.TipoEntrada = string.IsNullOrWhiteSpace(registroSalud.TipoEntrada)
+                    ? "Formulario"
+                    : registroSalud.TipoEntrada;
+
+                registroSalud.EstadoInsercion = "Procesando";
+                registroSalud.DimensionEmbedding = 1536;
+
+                // ==============================
+                // 1. GENERAR EMBEDDING
+                // ==============================
+                var relojEmbedding = Stopwatch.StartNew();
+
+                registroSalud.Embedding = GenerarEmbeddingTemporal(registroSalud.Descripcion);
+
+                relojEmbedding.Stop();
+
+                registroSalud.TiempoEmbeddingMs = (int)relojEmbedding.ElapsedMilliseconds;
+
+                // ==============================
+                // 2. BUSCAR REGISTRO SIMILAR
+                // ==============================
+                var registrosAnteriores = await _context.RegistrosSalud
+                    .Where(x => x.IdUsuario == registroSalud.IdUsuario && x.Embedding != null)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                decimal mayorSimilitud = 0;
+                Guid? idMasSimilar = null;
+
+                foreach (var anterior in registrosAnteriores)
+                {
+                    if (anterior.Embedding == null || registroSalud.Embedding == null)
+                        continue;
+
+                    decimal similitud = CalcularSimilitudCoseno(
+                        registroSalud.Embedding.Memory.ToArray(),
+                        anterior.Embedding.Memory.ToArray()
+                    );
+
+                    if (similitud > mayorSimilitud)
+                    {
+                        mayorSimilitud = similitud;
+                        idMasSimilar = anterior.IdRegistro;
+                    }
+                }
+
+                registroSalud.SimilitudDetectada = mayorSimilitud;
+                registroSalud.IdRegistroSimilar = idMasSimilar;
+
+                // Si es mayor o igual a 80%, se considera similar
+                registroSalud.EsSimilar = mayorSimilitud >= 0.80m;
+
+                // ==============================
+                // 3. FINALIZAR INSERCIÓN
+                // ==============================
+                registroSalud.EstadoInsercion = "Insertado";
+
+                relojTotal.Stop();
+                registroSalud.LatenciaMs = (int)relojTotal.ElapsedMilliseconds;
+
+                _context.RegistrosSalud.Add(registroSalud);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction(
+                    "GetRegistroSalud",
+                    new { id = registroSalud.IdRegistro },
+                    registroSalud
+                );
+            }
+            catch
+            {
+                relojTotal.Stop();
+                registroSalud.LatenciaMs = (int)relojTotal.ElapsedMilliseconds;
+                registroSalud.EstadoInsercion = "Error";
+
+                throw;
+            }
+        }
+
+        private Vector GenerarEmbeddingTemporal(string texto)
+        {
+            texto = texto.ToLower().Trim();
+
+            var valores = new float[1536];
+
+            for (int i = 0; i < texto.Length; i++)
+            {
+                int posicion = Math.Abs((texto[i] + i) % 1536);
+                valores[posicion] += 1f;
             }
 
-            // Fechas en UTC para evitar error con PostgreSQL timestamp with time zone
-            registroSalud.FechaRegistro = DateTime.UtcNow.Date;
-            registroSalud.HoraRegistro = DateTime.UtcNow.TimeOfDay;
-            registroSalud.FechaCreacion = DateTime.UtcNow;
+            // Normalizar para que no crezca demasiado
+            float suma = valores.Sum();
 
-            // Valores por defecto
-            registroSalud.TipoEntrada = string.IsNullOrWhiteSpace(registroSalud.TipoEntrada)
-                ? "Formulario"
-                : registroSalud.TipoEntrada;
+            if (suma > 0)
+            {
+                for (int i = 0; i < valores.Length; i++)
+                {
+                    valores[i] = valores[i] / suma;
+                }
+            }
 
-            registroSalud.EstadoInsercion = string.IsNullOrWhiteSpace(registroSalud.EstadoInsercion)
-                ? "Insertado"
-                : registroSalud.EstadoInsercion;
+            return new Vector(valores);
+        }
 
-            registroSalud.DimensionEmbedding = 1536;
+        private decimal CalcularSimilitudCoseno(float[] vectorA, float[] vectorB)
+        {
+            double productoPunto = 0;
+            double magnitudA = 0;
+            double magnitudB = 0;
 
-            // Por ahora puede ir vacío hasta conectar n8n/OpenAI
-            registroSalud.Embedding = null;
+            for (int i = 0; i < vectorA.Length; i++)
+            {
+                productoPunto += vectorA[i] * vectorB[i];
+                magnitudA += vectorA[i] * vectorA[i];
+                magnitudB += vectorB[i] * vectorB[i];
+            }
 
-            _context.RegistrosSalud.Add(registroSalud);
-            await _context.SaveChangesAsync();
+            if (magnitudA == 0 || magnitudB == 0)
+                return 0;
 
-            return CreatedAtAction("GetRegistroSalud", new { id = registroSalud.IdRegistro }, registroSalud);
+            double similitud = productoPunto / (Math.Sqrt(magnitudA) * Math.Sqrt(magnitudB));
+
+            return Math.Round((decimal)similitud, 4);
         }
 
         // DELETE: api/RegistrosSalud/5
