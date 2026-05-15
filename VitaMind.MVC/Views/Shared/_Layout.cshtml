@@ -1,50 +1,198 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - VitaMind.MVC</title>
-    <script type="importmap"></script>
+
+    <title>@ViewData["Title"] - VitaMind</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/VitaMind.MVC.styles.css" asp-append-version="true" />
+
+    <style>
+            body {
+                background: #f4f8fb;
+                color: #173b43;
+            }
+
+            .vm-navbar {
+                background: #ffffff;
+                border-bottom: 1px solid #e2edf0;
+                box-shadow: 0 4px 18px rgba(15, 56, 66, 0.06);
+            }
+
+            .vm-brand {
+                font-weight: 800;
+                color: #0d6efd !important;
+                letter-spacing: 0.2px;
+            }
+
+                .vm-brand span {
+                    color: #20c997;
+                }
+
+            .vm-nav-link {
+                color: #405158 !important;
+                font-weight: 600;
+                border-radius: 12px;
+                padding: 8px 12px !important;
+                margin: 0 3px;
+            }
+
+                .vm-nav-link:hover {
+                    background: #eef6ff;
+                    color: #0d6efd !important;
+                }
+
+            .vm-role-badge {
+                background: #e9f9f4;
+                color: #087f5b;
+                border: 1px solid #c7f1df;
+                padding: 7px 12px;
+                border-radius: 50px;
+                font-size: 0.88rem;
+                font-weight: 700;
+            }
+
+            .vm-main {
+                min-height: calc(100vh - 150px);
+            }
+
+            .vm-footer {
+                background: #ffffff;
+                border-top: 1px solid #e2edf0;
+                color: #6c757d;
+                padding: 16px 0;
+                margin-top: 40px;
+                font-size: 0.92rem;
+            }
+
+                .vm-footer strong {
+                    color: #173b43;
+                }
+    </style>
 </head>
+
 <body>
+    @{
+        var rol = Context.Session.GetString("Rol");
+        var nombre = Context.Session.GetString("Nombre");
+    }
+
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">VitaMind.MVC</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+        <nav class="navbar navbar-expand-lg vm-navbar">
+            <div class="container-fluid px-4">
+
+                <a class="navbar-brand vm-brand" asp-controller="Auth" asp-action="Login">
+                    Vita<span>Mind</span>
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#vitamindNavbar"
+                        aria-controls="vitamindNavbar" aria-expanded="false" aria-label="Abrir navegación">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+
+                <div class="collapse navbar-collapse" id="vitamindNavbar">
+
+                    @if (!string.IsNullOrEmpty(rol))
+                    {
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                            @if (rol == "Cliente")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link vm-nav-link" asp-controller="Cliente" asp-action="Index">
+                                        Panel Cliente
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link vm-nav-link" asp-controller="RegistrosSalud" asp-action="Create">
+                                        Nuevo Registro
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link vm-nav-link" asp-controller="RegistrosSalud" asp-action="Index">
+                                        Mis Registros
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link vm-nav-link" asp-controller="Chatbot" asp-action="Index">
+                                        Agente
+                                    </a>
+                                </li>
+                            }
+
+                            @if (rol == "Administrador")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link vm-nav-link" asp-controller="Admin" asp-action="Dashboard">
+                                        Dashboard
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link vm-nav-link" asp-controller="RegistrosSalud" asp-action="Index">
+                                        Registros
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link vm-nav-link" asp-controller="Chatbot" asp-action="Index">
+                                        Agente
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="vm-role-badge">
+                                @rol · @nombre
+                            </span>
+
+                            <a asp-controller="Auth" asp-action="Logout" class="btn btn-outline-danger btn-sm">
+                                Cerrar sesión
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <ul class="navbar-nav ms-auto">
+                            <li class="nav-item">
+                                <a class="nav-link vm-nav-link" asp-controller="Auth" asp-action="Login">
+                                    Iniciar sesión
+                                </a>
+                            </li>
+                        </ul>
+                    }
+
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - VitaMind.MVC - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <main role="main" class="vm-main pb-4">
+        @RenderBody()
+    </main>
+
+    <footer class="vm-footer">
+        <div class="container-fluid px-4 d-flex justify-content-between flex-wrap gap-2">
+            <span>
+                &copy; 2026 - <strong>VitaMind</strong> · Salud Inteligente
+            </span>
+            <span>
+                Base vectorial · n8n · OpenAI · Supabase
+            </span>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

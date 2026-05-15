@@ -2,46 +2,284 @@
     ViewData["Title"] = "Login - VitaMind";
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5">
+<style>
+    body {
+        background: linear-gradient(135deg, #eef6ff 0%, #e9f9f4 55%, #ffffff 100%);
+        min-height: 100vh;
+    }
 
-            <div class="card shadow">
-                <div class="card-header text-center">
-                    <h3>VitaMind</h3>
-                    <p class="mb-0">Salud Inteligente</p>
+    .vm-login-wrapper {
+        min-height: 88vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .vm-login-card {
+        width: 100%;
+        max-width: 980px;
+        background: #ffffff;
+        border-radius: 28px;
+        overflow: hidden;
+        border: 1px solid #dcefed;
+        box-shadow: 0 18px 45px rgba(15, 56, 66, 0.12);
+    }
+
+    .vm-login-info {
+        background: linear-gradient(180deg, #0d6efd 0%, #20c997 100%);
+        color: white;
+        height: 100%;
+        padding: 42px 34px;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .vm-login-info::after {
+            content: "";
+            position: absolute;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            right: -90px;
+            top: -80px;
+        }
+
+    .vm-brand-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.18);
+        border: 1px solid rgba(255,255,255,0.28);
+        padding: 8px 14px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 650;
+        margin-bottom: 22px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .vm-login-info h1 {
+        font-weight: 800;
+        margin-bottom: 12px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .vm-login-info p {
+        line-height: 1.65;
+        opacity: 0.95;
+        margin-bottom: 28px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .vm-feature {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 18px;
+        align-items: flex-start;
+        position: relative;
+        z-index: 1;
+    }
+
+    .vm-feature-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.22);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .vm-login-form {
+        padding: 42px 38px;
+    }
+
+    .vm-login-title {
+        color: #12343b;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .vm-login-subtitle {
+        color: #6c757d;
+        margin-bottom: 28px;
+    }
+
+    .form-label {
+        color: #173b43;
+        font-weight: 650;
+    }
+
+    .form-control {
+        border-radius: 14px;
+        padding: 12px 14px;
+        border: 1px solid #d8e4e8;
+    }
+
+        .form-control:focus {
+            border-color: #20c997;
+            box-shadow: 0 0 0 0.18rem rgba(32, 201, 151, 0.18);
+        }
+
+    .vm-btn {
+        border-radius: 14px;
+        padding: 12px 18px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #0d6efd, #20c997);
+        border: none;
+    }
+
+        .vm-btn:hover {
+            opacity: 0.95;
+        }
+
+    .vm-alert {
+        border-radius: 14px;
+        border: none;
+    }
+
+    .vm-note {
+        margin-top: 22px;
+        background: #f8fbfc;
+        border-left: 5px solid #20c997;
+        border-radius: 14px;
+        padding: 14px;
+        color: #52656b;
+        font-size: 0.92rem;
+    }
+
+    .vm-footer-text {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-top: 22px;
+        text-align: center;
+    }
+
+    .fade-in {
+        animation: fadeIn 0.45s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .vm-login-info {
+            padding: 30px 24px;
+        }
+
+        .vm-login-form {
+            padding: 30px 24px;
+        }
+    }
+</style>
+
+<div class="container vm-login-wrapper fade-in">
+    <div class="vm-login-card">
+        <div class="row g-0">
+
+            <div class="col-lg-5">
+                <div class="vm-login-info">
+                    <div class="vm-brand-badge">
+                        <span>✦</span>
+                        <span>VitaMind</span>
+                    </div>
+
+                    <h1>Salud Inteligente</h1>
+
+                    <p>
+                        Plataforma web para el registro, consulta y monitoreo de hábitos personales mediante
+                        dashboard, agente conversacional y base vectorial.
+                    </p>
+
+                    <div class="vm-feature">
+                        <div class="vm-feature-icon">🩺</div>
+                        <div>
+                            <strong>Seguimiento personal</strong><br />
+                            Registra información de sueño, alimentación, síntomas e hidratación.
+                        </div>
+                    </div>
+
+                    <div class="vm-feature">
+                        <div class="vm-feature-icon">🤖</div>
+                        <div>
+                            <strong>Agente conversacional</strong><br />
+                            Consulta tus registros mediante preguntas inteligentes.
+                        </div>
+                    </div>
+
+                    <div class="vm-feature">
+                        <div class="vm-feature-icon">⌕</div>
+                        <div>
+                            <strong>Búsqueda semántica</strong><br />
+                            Recupera información similar usando embeddings y Supabase Vector.
+                        </div>
+                    </div>
                 </div>
+            </div>
 
-                <div class="card-body">
+            <div class="col-lg-7">
+                <div class="vm-login-form">
+
+                    <h2 class="vm-login-title">Inicio de sesión</h2>
+                    <p class="vm-login-subtitle">
+                        Ingrese con un usuario registrado en la base de datos para acceder según su rol.
+                    </p>
+
                     @if (ViewBag.Error != null)
                     {
-                        <div class="alert alert-danger">
-                            @ViewBag.Error
+                        <div class="alert alert-danger vm-alert">
+                            <strong>Error:</strong> @ViewBag.Error
                         </div>
                     }
 
                     <form asp-controller="Auth" asp-action="Login" method="post">
-                        <div class="mb-3">
-                            <label class="form-label">Correo</label>
-                            <input type="email" name="correo" class="form-control" placeholder="admin@vitamind.com" required />
+
+                        <div class="mb-4">
+                            <label class="form-label">Correo electrónico</label>
+                            <input type="email"
+                                   name="correo"
+                                   class="form-control"
+                                   placeholder="Ejemplo: juan@vitamind.com"
+                                   required />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-4">
                             <label class="form-label">Contraseña</label>
-                            <input type="password" name="password" class="form-control" placeholder="123456" required />
+                            <input type="password"
+                                   name="password"
+                                   class="form-control"
+                                   placeholder="Ingrese su contraseña"
+                                   required />
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100">
-                            Ingresar
+                        <button type="submit" class="btn btn-primary vm-btn w-100">
+                            Ingresar a VitaMind
                         </button>
                     </form>
 
-                    <hr />
+                    <div class="vm-note">
+                        <strong>Acceso por roles:</strong> el sistema identifica si el usuario pertenece al rol
+                        Cliente o Administrador y redirige automáticamente al panel correspondiente.
+                    </div>
 
-                    <small class="text-muted">
-                        Usuario admin: admin@vitamind.com / 123456 <br />
-                        Usuario cliente: juan@vitamind.com / 123456
-                    </small>
+                    <p class="vm-footer-text">
+                        VitaMind no realiza diagnósticos médicos. La información registrada es solo para seguimiento personal.
+                    </p>
+
                 </div>
             </div>
 

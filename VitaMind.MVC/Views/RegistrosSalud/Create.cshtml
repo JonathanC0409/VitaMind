@@ -1,78 +1,322 @@
 ﻿@model VitaMind.Models.RegistroSalud
 
 @{
-    ViewData["Title"] = "Nuevo Registro de Salud";
+    ViewData["Title"] = "Nuevo Registro de Salud - VitaMind";
 }
 
-<div class="container mt-4">
-    <h2>Nuevo Registro de Salud</h2>
+<style>
+    body {
+        background: #f4f8fb;
+    }
+
+    .vm-container {
+        max-width: 1050px;
+        margin: 0 auto;
+    }
+
+    .vm-header {
+        background: linear-gradient(135deg, #e9f9f4 0%, #eef6ff 60%, #ffffff 100%);
+        border: 1px solid #dcefed;
+        border-radius: 26px;
+        padding: 30px;
+        margin-bottom: 26px;
+        box-shadow: 0 10px 28px rgba(19, 80, 96, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .vm-header::after {
+            content: "";
+            position: absolute;
+            width: 230px;
+            height: 230px;
+            border-radius: 50%;
+            background: rgba(32, 201, 151, 0.12);
+            right: -70px;
+            top: -80px;
+        }
+
+    .vm-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #ffffff;
+        color: #087f5b;
+        border: 1px solid #c7f1df;
+        padding: 8px 14px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 650;
+        margin-bottom: 14px;
+    }
+
+    .vm-header h1 {
+        color: #12343b;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .vm-header p {
+        color: #52656b;
+        font-size: 1.03rem;
+        max-width: 720px;
+        margin-bottom: 0;
+    }
+
+    .vm-form-card {
+        background: #ffffff;
+        border: 1px solid #e2edf0;
+        border-radius: 24px;
+        box-shadow: 0 10px 25px rgba(15, 56, 66, 0.08);
+        overflow: hidden;
+    }
+
+    .vm-form-side {
+        background: linear-gradient(180deg, #0d6efd 0%, #20c997 100%);
+        color: white;
+        height: 100%;
+        padding: 28px;
+    }
+
+        .vm-form-side h4 {
+            font-weight: 750;
+            margin-bottom: 16px;
+        }
+
+        .vm-form-side p {
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+    .vm-step {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+        align-items: flex-start;
+    }
+
+    .vm-step-number {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.22);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .vm-form-content {
+        padding: 30px;
+    }
+
+    .form-label {
+        color: #173b43;
+        font-weight: 650;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 14px;
+        padding: 11px 13px;
+        border: 1px solid #d8e4e8;
+    }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #20c997;
+            box-shadow: 0 0 0 0.18rem rgba(32, 201, 151, 0.18);
+        }
+
+    .vm-alert {
+        border-radius: 16px;
+        border: none;
+        padding: 14px 16px;
+    }
+
+    .vm-help-box {
+        background: #f8fbfc;
+        border-left: 5px solid #20c997;
+        border-radius: 14px;
+        padding: 15px;
+        color: #52656b;
+        margin-bottom: 22px;
+    }
+
+    .vm-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 22px;
+    }
+
+    .vm-btn {
+        border-radius: 14px;
+        padding: 11px 18px;
+        font-weight: 650;
+    }
+
+    .vm-note {
+        margin-top: 22px;
+        color: #6c757d;
+        font-size: 0.92rem;
+    }
+
+    .fade-in {
+        animation: fadeIn 0.45s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<div class="container mt-4 vm-container fade-in">
+
+    <section class="vm-header">
+        <div class="vm-badge">
+            <span>🩺</span>
+            <span>Registro de bienestar</span>
+        </div>
+
+        <h1>Nuevo Registro de Salud</h1>
+
+        <p>
+            Ingresa información sobre tus hábitos, síntomas o estado emocional.
+            VitaMind almacenará el registro para su consulta posterior y análisis mediante el agente inteligente.
+        </p>
+    </section>
 
     @if (ViewBag.Error != null)
     {
-        <div class="alert alert-danger">
-            @ViewBag.Error
+        <div class="alert alert-danger vm-alert">
+            <strong>Error:</strong> @ViewBag.Error
         </div>
     }
 
     @if (TempData["Mensaje"] != null)
     {
-        <div class="alert alert-success">
-            @TempData["Mensaje"]
+        <div class="alert alert-success vm-alert">
+            <strong>Correcto:</strong> @TempData["Mensaje"]
         </div>
     }
 
-    <div class="alert alert-warning">
-        VitaMind no realiza diagnósticos médicos. La información registrada es solo para seguimiento personal.
+    <div class="row g-0 vm-form-card">
+
+        <div class="col-lg-4">
+            <div class="vm-form-side">
+                <h4>Seguimiento personal</h4>
+
+                <p>
+                    Este formulario permite registrar información diaria relacionada con tu bienestar.
+                    Los datos pueden ser usados posteriormente para búsquedas semánticas y consultas con el agente conversacional.
+                </p>
+
+                <div class="vm-step">
+                    <div class="vm-step-number">1</div>
+                    <div>
+                        <strong>Clasifica el registro</strong><br />
+                        Selecciona una categoría como sueño, hidratación o alimentación.
+                    </div>
+                </div>
+
+                <div class="vm-step">
+                    <div class="vm-step-number">2</div>
+                    <div>
+                        <strong>Describe lo ocurrido</strong><br />
+                        Escribe una descripción clara del hábito, síntoma o estado.
+                    </div>
+                </div>
+
+                <div class="vm-step">
+                    <div class="vm-step-number">3</div>
+                    <div>
+                        <strong>Guarda en VitaMind</strong><br />
+                        El sistema enviará el registro para su almacenamiento y procesamiento inteligente.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="vm-form-content">
+
+                <div class="vm-help-box">
+                    <strong>Importante:</strong> VitaMind no realiza diagnósticos médicos.
+                    La información registrada es únicamente para seguimiento personal y análisis académico del sistema.
+                </div>
+
+                <form asp-controller="RegistrosSalud" asp-action="Create" method="post">
+
+                    <div class="mb-4">
+                        <label class="form-label">Categoría del registro</label>
+                        <select asp-for="Categoria" class="form-select" required>
+                            <option value="">Seleccione una categoría</option>
+                            <option value="Sueño">Sueño</option>
+                            <option value="Hidratación">Hidratación</option>
+                            <option value="Alimentación">Alimentación</option>
+                            <option value="Ejercicio">Ejercicio</option>
+                            <option value="Síntomas">Síntomas</option>
+                            <option value="Estado emocional">Estado emocional</option>
+                            <option value="Hábitos generales">Hábitos generales</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Descripción</label>
+                        <textarea asp-for="Descripcion"
+                                  class="form-control"
+                                  rows="5"
+                                  placeholder="Ejemplo: Dormí 5 horas y amanecí cansado."
+                                  required></textarea>
+                        <small class="text-muted">
+                            Describe el evento con palabras simples. Esto ayuda al agente a encontrar registros similares.
+                        </small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Intensidad percibida</label>
+                        <select asp-for="Intensidad" class="form-select">
+                            <option value="">Seleccione intensidad</option>
+                            <option value="Baja">Baja</option>
+                            <option value="Media">Media</option>
+                            <option value="Alta">Alta</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Observación adicional</label>
+                        <textarea asp-for="Observacion"
+                                  class="form-control"
+                                  rows="3"
+                                  placeholder="Ejemplo: Me pasó después de estudiar o trabajar."></textarea>
+                    </div>
+
+                    <div class="vm-actions">
+                        <button type="submit" class="btn btn-success vm-btn">
+                            Guardar registro con n8n
+                        </button>
+
+                        <a asp-controller="Cliente" asp-action="Index" class="btn btn-outline-secondary vm-btn">
+                            Cancelar
+                        </a>
+                    </div>
+
+                    <p class="vm-note">
+                        Al guardar, el registro se asociará a tu usuario y podrá ser consultado posteriormente desde el historial o el agente conversacional.
+                    </p>
+
+                </form>
+            </div>
+        </div>
     </div>
-
-    <form asp-controller="RegistrosSalud" asp-action="Create" method="post">
-
-        <div class="mb-3">
-            <label class="form-label">Categoría</label>
-            <select asp-for="Categoria" class="form-control" required>
-                <option value="">Seleccione una categoría</option>
-                <option value="Sueño">Sueño</option>
-                <option value="Hidratación">Hidratación</option>
-                <option value="Alimentación">Alimentación</option>
-                <option value="Ejercicio">Ejercicio</option>
-                <option value="Síntomas">Síntomas</option>
-                <option value="Estado emocional">Estado emocional</option>
-                <option value="Hábitos generales">Hábitos generales</option>
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Descripción</label>
-            <textarea asp-for="Descripcion"
-                      class="form-control"
-                      rows="4"
-                      placeholder="Ejemplo: Dormí 5 horas y amanecí cansado."></textarea>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Intensidad</label>
-            <select asp-for="Intensidad" class="form-control">
-                <option value="">Seleccione intensidad</option>
-                <option value="Baja">Baja</option>
-                <option value="Media">Media</option>
-                <option value="Alta">Alta</option>
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Observación</label>
-            <textarea asp-for="Observacion"
-                      class="form-control"
-                      rows="3"
-                      placeholder="Ejemplo: Me pasó después de estudiar o trabajar."></textarea>
-        </div>
-
-        <button type="submit" class="btn btn-primary">
-            Guardar registro con n8n
-        </button>
-
-        <a asp-action="Index" class="btn btn-secondary">
-            Cancelar
-        </a>
-    </form>
 </div>

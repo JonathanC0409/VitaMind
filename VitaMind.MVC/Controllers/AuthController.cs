@@ -1,9 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using System.Text;
+using VitaMind.Models;
 
 namespace VitaMind.MVC.Controllers
 {
     public class AuthController : Controller
     {
+        private readonly string endpointLogin = "https://localhost:7042/api/Usuarios/login";
+
         [HttpGet]
         public IActionResult Login()
         {
@@ -11,7 +16,7 @@ namespace VitaMind.MVC.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(string correo, string password)
+        public async Task<IActionResult> Login(string correo, string password)
         {
             if (string.IsNullOrWhiteSpace(correo) || string.IsNullOrWhiteSpace(password))
             {
@@ -19,26 +24,57 @@ namespace VitaMind.MVC.Controllers
                 return View();
             }
 
-            if (correo == "admin@vitamind.com" && password == "123456")
+            var login = new Usuario
             {
-                HttpContext.Session.SetString("Rol", "Administrador");
-                HttpContext.Session.SetString("Correo", correo);
-                HttpContext.Session.SetString("Nombre", "Administrador VitaMind");
+                Correo = correo,
+                PasswordHash = password,
+                Nombre = "",
+                Rol = "",
+                Estado = "Activo",
+                FechaRegistro = DateTime.UtcNow
+            };
 
+            using var client = new HttpClient();
+
+            var content = new StringContent(
+                JsonConvert.SerializeObject(login),
+                Encoding.UTF8,
+                "application/json"
+            );
+
+            var response = await client.PostAsync(endpointLogin, content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ViewBag.Error = "Credenciales incorrectas.";
+                return View();
+            }
+
+            var json = await response.Content.ReadAsStringAsync();
+            var usuario = JsonConvert.DeserializeObject<Usuario>(json);
+
+            if (usuario == null)
+            {
+                ViewBag.Error = "No se pudo obtener la información del usuario.";
+                return View();
+            }
+
+            HttpContext.Session.SetString("IdUsuario", usuario.IdUsuario.ToString());
+            HttpContext.Session.SetString("Rol", usuario.Rol);
+            HttpContext.Session.SetString("Correo", usuario.Correo);
+            HttpContext.Session.SetString("Nombre", usuario.Nombre);
+
+            if (usuario.Rol == "Administrador")
+            {
                 return RedirectToAction("Dashboard", "Admin");
             }
 
-            if (correo == "juan@vitamind.com" && password == "123456")
+            if (usuario.Rol == "Cliente")
             {
-                HttpContext.Session.SetString("IdUsuario", "22222222-2222-2222-2222-222222222222");
-                HttpContext.Session.SetString("Rol", "Cliente");
-                HttpContext.Session.SetString("Correo", correo);
-                HttpContext.Session.SetString("Nombre", "Juan Pérez");
-
                 return RedirectToAction("Index", "Cliente");
             }
 
-            ViewBag.Error = "Credenciales incorrectas.";
+            ViewBag.Error = "Rol no válido.";
             return View();
         }
 

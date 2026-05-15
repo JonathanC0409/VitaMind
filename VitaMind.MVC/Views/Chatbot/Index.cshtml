@@ -1,121 +1,436 @@
 ﻿@{
-    ViewData["Title"] = "Agente Conversacional";
+    ViewData["Title"] = "Agente Conversacional - VitaMind";
 }
 
 <style>
-    .chat-wrapper {
-        max-width: 900px;
+    body {
+        background: #f4f8fb;
+    }
+
+    .vm-chat-container {
+        max-width: 1100px;
         margin: 0 auto;
     }
 
-    .chat-box {
-        background: #f8f9fa;
-        border: 1px solid #ddd;
-        border-radius: 15px;
-        padding: 20px;
-        min-height: 300px;
+    .vm-hero {
+        background: linear-gradient(135deg, #e9f9f4 0%, #eef6ff 60%, #ffffff 100%);
+        border: 1px solid #dcefed;
+        border-radius: 26px;
+        padding: 32px;
+        margin-bottom: 26px;
+        box-shadow: 0 10px 28px rgba(19, 80, 96, 0.08);
+        position: relative;
+        overflow: hidden;
     }
 
-    .chat-message {
+        .vm-hero::after {
+            content: "";
+            position: absolute;
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            background: rgba(111, 66, 193, 0.10);
+            right: -75px;
+            top: -80px;
+        }
+
+    .vm-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #ffffff;
+        color: #6f42c1;
+        border: 1px solid #e1d3ff;
+        padding: 8px 14px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 650;
+        margin-bottom: 14px;
+    }
+
+    .vm-hero h1 {
+        color: #12343b;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .vm-hero p {
+        color: #52656b;
+        font-size: 1.03rem;
+        max-width: 760px;
+        margin-bottom: 0;
+    }
+
+    .vm-chat-card {
+        background: #ffffff;
+        border: 1px solid #e2edf0;
+        border-radius: 24px;
+        box-shadow: 0 10px 25px rgba(15, 56, 66, 0.08);
+        overflow: hidden;
+    }
+
+    .vm-chat-side {
+        background: linear-gradient(180deg, #0d6efd 0%, #6f42c1 100%);
+        color: white;
+        height: 100%;
+        padding: 28px;
+    }
+
+        .vm-chat-side h4 {
+            font-weight: 750;
+            margin-bottom: 16px;
+        }
+
+        .vm-chat-side p {
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+    .vm-step {
         display: flex;
-        margin-bottom: 15px;
+        gap: 12px;
+        margin-top: 20px;
+        align-items: flex-start;
     }
 
-    .chat-message.user {
-        justify-content: flex-end;
+    .vm-step-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.22);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        flex-shrink: 0;
     }
 
-    .chat-message.bot {
-        justify-content: flex-start;
+    .vm-chat-content {
+        padding: 30px;
     }
 
-    .bubble {
-        max-width: 75%;
-        padding: 12px 16px;
+    .vm-alert {
+        background: #fff9e8;
+        border-left: 5px solid #ffc107;
+        border-radius: 16px;
+        padding: 16px;
+        color: #6a5200;
+        margin-bottom: 22px;
+    }
+
+    .vm-suggestions {
+        background: #f8fbfc;
+        border: 1px solid #e6eef1;
         border-radius: 18px;
-        line-height: 1.5;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        padding: 18px;
+        margin-bottom: 22px;
+    }
+
+        .vm-suggestions h5 {
+            color: #173b43;
+            font-weight: 750;
+            margin-bottom: 12px;
+        }
+
+    .vm-suggestion-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 0;
+        padding-left: 0;
+        list-style: none;
+    }
+
+        .vm-suggestion-list li {
+            background: #ffffff;
+            border: 1px solid #e2edf0;
+            border-radius: 14px;
+            padding: 12px;
+            color: #52656b;
+            font-size: 0.94rem;
+        }
+
+    .form-label {
+        color: #173b43;
+        font-weight: 650;
+    }
+
+    .form-control {
+        border-radius: 14px;
+        padding: 12px 14px;
+        border: 1px solid #d8e4e8;
+    }
+
+        .form-control:focus {
+            border-color: #6f42c1;
+            box-shadow: 0 0 0 0.18rem rgba(111, 66, 193, 0.16);
+        }
+
+    .vm-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 18px;
+    }
+
+    .vm-btn {
+        border-radius: 14px;
+        padding: 11px 18px;
+        font-weight: 650;
+    }
+
+    .vm-chat-box {
+        background: #f8fbfc;
+        border: 1px solid #e2edf0;
+        border-radius: 22px;
+        padding: 22px;
+        margin-top: 28px;
+    }
+
+    .vm-message {
+        display: flex;
+        margin-bottom: 16px;
+    }
+
+        .vm-message.user {
+            justify-content: flex-end;
+        }
+
+        .vm-message.bot {
+            justify-content: flex-start;
+        }
+
+    .vm-bubble {
+        max-width: 78%;
+        padding: 14px 18px;
+        border-radius: 20px;
+        line-height: 1.55;
+        box-shadow: 0 4px 12px rgba(15, 56, 66, 0.08);
         white-space: pre-line;
     }
 
-    .user .bubble {
+    .user .vm-bubble {
         background: #0d6efd;
         color: white;
-        border-bottom-right-radius: 5px;
+        border-bottom-right-radius: 6px;
     }
 
-    .bot .bubble {
-        background: white;
-        color: #212529;
-        border: 1px solid #dee2e6;
-        border-bottom-left-radius: 5px;
-    }
-
-    .chat-label {
-        font-size: 0.85rem;
-        font-weight: bold;
-        margin-bottom: 4px;
-        opacity: 0.8;
-    }
-
-    .chat-meta {
-        margin-top: 20px;
-        padding: 15px;
+    .bot .vm-bubble {
         background: #ffffff;
-        border: 1px solid #e5e5e5;
-        border-radius: 12px;
+        color: #405158;
+        border: 1px solid #e2edf0;
+        border-bottom-left-radius: 6px;
     }
 
-    .chat-meta p {
-        margin-bottom: 8px;
+    .vm-message-label {
+        font-size: 0.84rem;
+        font-weight: 750;
+        margin-bottom: 5px;
+        opacity: 0.85;
+    }
+
+    .vm-metrics {
+        margin-top: 22px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .vm-metric-card {
+        background: #ffffff;
+        border: 1px solid #e2edf0;
+        border-radius: 18px;
+        padding: 16px;
+        box-shadow: 0 6px 18px rgba(15, 56, 66, 0.05);
+    }
+
+    .vm-metric-label {
+        color: #6c757d;
+        font-size: 0.88rem;
+        margin-bottom: 6px;
+    }
+
+    .vm-metric-value {
+        color: #173b43;
+        font-weight: 800;
+        font-size: 1.2rem;
+        margin-bottom: 0;
+    }
+
+    .vm-note {
+        margin-top: 18px;
+        background: #ffffff;
+        border-left: 5px solid #6f42c1;
+        border-radius: 14px;
+        padding: 15px;
+        color: #52656b;
+    }
+
+    .fade-in {
+        animation: fadeIn 0.45s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@media (max-width: 992px) {
+        .vm-suggestion-list {
+            grid-template-columns: 1fr;
+        }
+
+        .vm-metrics {
+            grid-template-columns: 1fr;
+        }
+
+        .vm-bubble {
+            max-width: 92%;
+        }
     }
 </style>
 
-<div class="container mt-4 chat-wrapper">
-    <h2 class="mb-3">Agente Conversacional VitaMind</h2>
+<div class="container mt-4 vm-chat-container fade-in">
 
-    <div class="alert alert-info">
-        Puedes consultar información sobre tus registros. El agente no realiza diagnósticos médicos.
+    <section class="vm-hero">
+        <div class="vm-badge">
+            <span>🤖</span>
+            <span>Agente inteligente · Base vectorial</span>
+        </div>
+
+        <h1>Agente Conversacional VitaMind</h1>
+
+        <p>
+            Consulta información relacionada con tus registros de salud y hábitos personales.
+            El agente utiliza n8n, OpenAI y Supabase Vector para recuperar datos por similitud semántica.
+        </p>
+    </section>
+
+    <div class="row g-0 vm-chat-card">
+
+        <div class="col-lg-4">
+            <div class="vm-chat-side">
+                <h4>Consulta inteligente</h4>
+
+                <p>
+                    El agente analiza tu pregunta y busca registros relacionados en la base vectorial.
+                    Esto permite encontrar información similar aunque no se usen las mismas palabras.
+                </p>
+
+                <div class="vm-step">
+                    <div class="vm-step-icon">1</div>
+                    <div>
+                        <strong>Escribe tu pregunta</strong><br />
+                        Puedes consultar sobre sueño, cansancio, hábitos o síntomas registrados.
+                    </div>
+                </div>
+
+                <div class="vm-step">
+                    <div class="vm-step-icon">2</div>
+                    <div>
+                        <strong>Búsqueda semántica</strong><br />
+                        VitaMind consulta documentos vectorizados en Supabase.
+                    </div>
+                </div>
+
+                <div class="vm-step">
+                    <div class="vm-step-icon">3</div>
+                    <div>
+                        <strong>Respuesta organizada</strong><br />
+                        El agente resume los registros encontrados de forma clara.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="vm-chat-content">
+
+                <div class="vm-alert">
+                    <strong>Importante:</strong> VitaMind no realiza diagnósticos médicos.
+                    La respuesta corresponde únicamente a información registrada por el usuario en el sistema.
+                </div>
+
+                <div class="vm-suggestions">
+                    <h5>Ejemplos de preguntas</h5>
+
+                    <ul class="vm-suggestion-list">
+                        <li>¿Qué registros tengo relacionados con sueño y cansancio?</li>
+                        <li>Busca registros similares a “me levanté con poca energía”.</li>
+                        <li>¿Qué hábitos se repiten en mis registros?</li>
+                        <li>¿Tengo registros relacionados con hidratación o alimentación?</li>
+                    </ul>
+                </div>
+
+                <form asp-controller="Chatbot" asp-action="Preguntar" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Escribe tu pregunta</label>
+                        <textarea name="pregunta"
+                                  class="form-control"
+                                  rows="5"
+                                  required
+                                  placeholder="Ejemplo: ¿Qué registros tengo relacionados con cansancio y dolor de cabeza?"></textarea>
+                    </div>
+
+                    <div class="vm-actions">
+                        <button type="submit" class="btn btn-primary vm-btn">
+                            Preguntar al agente
+                        </button>
+
+                        <a asp-controller="Cliente" asp-action="Index" class="btn btn-outline-secondary vm-btn">
+                            Volver al panel
+                        </a>
+                    </div>
+                </form>
+
+                @if (ViewBag.Respuesta != null)
+                {
+                    <div class="vm-chat-box">
+                        <div class="vm-message user">
+                            <div class="vm-bubble">
+                                <div class="vm-message-label">Tú</div>
+                                @ViewBag.Pregunta
+                            </div>
+                        </div>
+
+                        <div class="vm-message bot">
+                            <div class="vm-bubble">
+                                <div class="vm-message-label">VitaMind</div>
+                                @ViewBag.Respuesta
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vm-metrics">
+                        <div class="vm-metric-card">
+                            <div class="vm-metric-label">Tiempo de consulta</div>
+                            <p class="vm-metric-value">@(ViewBag.TiempoConsultaMs ?? 0) ms</p>
+                        </div>
+
+                        <div class="vm-metric-card">
+                            <div class="vm-metric-label">Registros recuperados</div>
+                            <p class="vm-metric-value">@(ViewBag.RegistrosRecuperados ?? 0)</p>
+                        </div>
+
+                        <div class="vm-metric-card">
+                            <div class="vm-metric-label">Similitud promedio</div>
+                            <p class="vm-metric-value">@(ViewBag.SimilitudPromedio ?? "No calculada")</p>
+                        </div>
+                    </div>
+
+                    <div class="vm-note">
+                        La respuesta fue procesada mediante el agente conversacional conectado a n8n y a la base vectorial de Supabase.
+                    </div>
+                }
+
+            </div>
+        </div>
     </div>
-
-    <form asp-controller="Chatbot" asp-action="Preguntar" method="post" class="mb-4">
-        <div class="mb-3">
-            <label class="form-label">Pregunta</label>
-            <textarea name="pregunta" class="form-control" rows="4"
-                      placeholder="Ejemplo: ¿Qué registros tengo relacionados con cansancio y dolor de cabeza?"></textarea>
-        </div>
-
-        <button type="submit" class="btn btn-primary">
-            Preguntar
-        </button>
-
-        <a asp-controller="Cliente" asp-action="Index" class="btn btn-secondary">
-            Volver
-        </a>
-    </form>
-
-    @if (ViewBag.Respuesta != null)
-    {
-        <div class="chat-box">
-            <div class="chat-message user">
-                <div class="bubble">
-                    <div class="chat-label">Tú</div>
-                    @ViewBag.Pregunta
-                </div>
-            </div>
-
-            <div class="chat-message bot">
-                <div class="bubble">
-                    <div class="chat-label">VitaMind</div>
-                    @ViewBag.Respuesta
-                </div>
-            </div>
-        </div>
-
-        <div class="chat-meta">
-            <p><strong>Tiempo de consulta:</strong> @ViewBag.TiempoConsultaMs ms</p>
-            <p><strong>Registros recuperados:</strong> @ViewBag.RegistrosRecuperados</p>
-            <p><strong>Similitud promedio:</strong> @ViewBag.SimilitudPromedio</p>
-        </div>
-    }
 </div>

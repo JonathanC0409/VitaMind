@@ -1,89 +1,434 @@
 ﻿@{
-    ViewData["Title"] = "Dashboard Administrador";
+    ViewData["Title"] = "Dashboard Administrador - VitaMind";
 }
 
-<div class="container mt-4">
-    <h2>Dashboard Administrativo</h2>
-    <p>Bienvenido, <strong>@ViewBag.Nombre</strong></p>
+<style>
+    body {
+        background: #f4f8fb;
+    }
 
-    <div class="row mt-4">
+    .vm-admin-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
 
-        <div class="col-md-3 mb-3">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <h6>Total registros</h6>
-                    <h3>@ViewBag.TotalRegistros</h3>
+    .vm-hero {
+        background: linear-gradient(135deg, #e9f9f4 0%, #eef6ff 60%, #ffffff 100%);
+        border: 1px solid #dcefed;
+        border-radius: 26px;
+        padding: 32px;
+        margin-bottom: 26px;
+        box-shadow: 0 10px 28px rgba(19, 80, 96, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .vm-hero::after {
+            content: "";
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: rgba(13, 110, 253, 0.10);
+            right: -75px;
+            top: -85px;
+        }
+
+    .vm-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #ffffff;
+        color: #0d6efd;
+        border: 1px solid #d4e6ff;
+        padding: 8px 14px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 650;
+        margin-bottom: 14px;
+    }
+
+    .vm-hero h1 {
+        color: #12343b;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .vm-hero p {
+        color: #52656b;
+        font-size: 1.03rem;
+        max-width: 780px;
+        margin-bottom: 0;
+    }
+
+    .vm-user {
+        color: #087f5b;
+        font-weight: 750;
+    }
+
+    .vm-section-title {
+        color: #173b43;
+        font-weight: 800;
+        margin-bottom: 16px;
+    }
+
+    .vm-metric-card {
+        background: #ffffff;
+        border: 1px solid #e2edf0;
+        border-radius: 22px;
+        padding: 22px;
+        box-shadow: 0 10px 25px rgba(15, 56, 66, 0.07);
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.25s ease;
+    }
+
+        .vm-metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 34px rgba(15, 56, 66, 0.12);
+        }
+
+        .vm-metric-card::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 5px;
+            left: 0;
+            top: 0;
+        }
+
+        .vm-metric-card.primary::before {
+            background: #0d6efd;
+        }
+
+        .vm-metric-card.success::before {
+            background: #20c997;
+        }
+
+        .vm-metric-card.warning::before {
+            background: #ffc107;
+        }
+
+        .vm-metric-card.danger::before {
+            background: #dc3545;
+        }
+
+        .vm-metric-card.purple::before {
+            background: #6f42c1;
+        }
+
+        .vm-metric-card.info::before {
+            background: #0dcaf0;
+        }
+
+    .vm-metric-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 650;
+        margin-bottom: 8px;
+    }
+
+    .vm-metric-value {
+        color: #12343b;
+        font-size: 2rem;
+        font-weight: 850;
+        margin-bottom: 4px;
+    }
+
+    .vm-metric-help {
+        color: #6c757d;
+        font-size: 0.88rem;
+        margin-bottom: 0;
+    }
+
+    .vm-icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 14px;
+    }
+
+    .vm-icon-blue {
+        background: #e7f1ff;
+        color: #0d6efd;
+    }
+
+    .vm-icon-green {
+        background: #e9f9f4;
+        color: #087f5b;
+    }
+
+    .vm-icon-yellow {
+        background: #fff8db;
+        color: #9a7a00;
+    }
+
+    .vm-icon-red {
+        background: #fff0f1;
+        color: #dc3545;
+    }
+
+    .vm-icon-purple {
+        background: #f3ecff;
+        color: #6f42c1;
+    }
+
+    .vm-icon-cyan {
+        background: #e6f8fb;
+        color: #0dcaf0;
+    }
+
+    .vm-panel {
+        background: #ffffff;
+        border: 1px solid #e2edf0;
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(15, 56, 66, 0.07);
+        margin-top: 26px;
+    }
+
+        .vm-panel h5 {
+            color: #173b43;
+            font-weight: 800;
+            margin-bottom: 14px;
+        }
+
+    .vm-list-item {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        margin-bottom: 14px;
+        color: #52656b;
+    }
+
+    .vm-list-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: #e9f9f4;
+        color: #087f5b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-weight: 700;
+    }
+
+    .vm-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 28px;
+    }
+
+    .vm-btn {
+        border-radius: 14px;
+        padding: 11px 18px;
+        font-weight: 650;
+    }
+
+    .vm-note {
+        margin-top: 24px;
+        background: #ffffff;
+        border-left: 5px solid #20c997;
+        border-radius: 14px;
+        padding: 15px;
+        color: #52656b;
+        box-shadow: 0 6px 18px rgba(15, 56, 66, 0.05);
+    }
+
+    .fade-in {
+        animation: fadeIn 0.45s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<div class="container mt-4 vm-admin-container fade-in">
+
+    <section class="vm-hero">
+        <div class="vm-badge">
+            <span>📊</span>
+            <span>Dashboard administrativo</span>
+        </div>
+
+        <h1>Monitoreo General de VitaMind</h1>
+
+        <p>
+            Bienvenido, <span class="vm-user">@ViewBag.Nombre</span>.
+            Desde este panel puedes supervisar la actividad del sistema, revisar métricas operativas,
+            controlar errores y analizar el uso de la base vectorial.
+        </p>
+    </section>
+
+    <h4 class="vm-section-title">Resumen general del sistema</h4>
+
+    <div class="row g-4">
+
+        <div class="col-lg-3 col-md-6">
+            <div class="vm-metric-card primary">
+                <div class="vm-icon-box vm-icon-blue">📋</div>
+                <div class="vm-metric-label">Total de registros</div>
+                <div class="vm-metric-value">@(ViewBag.TotalRegistros ?? 0)</div>
+                <p class="vm-metric-help">Registros almacenados en VitaMind.</p>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="vm-metric-card success">
+                <div class="vm-icon-box vm-icon-green">👥</div>
+                <div class="vm-metric-label">Total de usuarios</div>
+                <div class="vm-metric-value">@(ViewBag.TotalUsuarios ?? 0)</div>
+                <p class="vm-metric-help">Clientes y administradores registrados.</p>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="vm-metric-card purple">
+                <div class="vm-icon-box vm-icon-purple">🤖</div>
+                <div class="vm-metric-label">Consultas al agente</div>
+                <div class="vm-metric-value">@(ViewBag.TotalConsultas ?? 0)</div>
+                <p class="vm-metric-help">Preguntas realizadas al chatbot.</p>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="vm-metric-card danger">
+                <div class="vm-icon-box vm-icon-red">⚠️</div>
+                <div class="vm-metric-label">Errores registrados</div>
+                <div class="vm-metric-value">@(ViewBag.Errores ?? 0)</div>
+                <p class="vm-metric-help">Errores de ingreso o procesamiento.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <h4 class="vm-section-title mt-5">Rendimiento y base vectorial</h4>
+
+    <div class="row g-4">
+
+        <div class="col-lg-4 col-md-6">
+            <div class="vm-metric-card info">
+                <div class="vm-icon-box vm-icon-cyan">⏱️</div>
+                <div class="vm-metric-label">Latencia promedio</div>
+                <div class="vm-metric-value">@(ViewBag.LatenciaPromedio ?? 0)</div>
+                <p class="vm-metric-help">Tiempo promedio de inserción en ms.</p>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+            <div class="vm-metric-card success">
+                <div class="vm-icon-box vm-icon-green">✅</div>
+                <div class="vm-metric-label">Tasa de éxito</div>
+                <div class="vm-metric-value">@(ViewBag.TasaExito ?? 0)%</div>
+                <p class="vm-metric-help">Inserciones correctas frente al total de intentos.</p>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-12">
+            <div class="vm-metric-card warning">
+                <div class="vm-icon-box vm-icon-yellow">🧠</div>
+                <div class="vm-metric-label">Vectores almacenados</div>
+                <div class="vm-metric-value">@(ViewBag.Vectores ?? 0)</div>
+                <p class="vm-metric-help">Embeddings usados para búsqueda semántica.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row g-4 mt-2">
+
+        <div class="col-lg-6">
+            <div class="vm-panel">
+                <h5>Indicadores que debe supervisar el administrador</h5>
+
+                <div class="vm-list-item">
+                    <div class="vm-list-icon">1</div>
+                    <div>
+                        <strong>Actividad de usuarios</strong><br />
+                        Revisión de registros ingresados, consultas realizadas y uso del agente conversacional.
+                    </div>
+                </div>
+
+                <div class="vm-list-item">
+                    <div class="vm-list-icon">2</div>
+                    <div>
+                        <strong>Calidad de datos</strong><br />
+                        Control de registros incompletos, errores de ingreso y posibles duplicados semánticos.
+                    </div>
+                </div>
+
+                <div class="vm-list-item">
+                    <div class="vm-list-icon">3</div>
+                    <div>
+                        <strong>Rendimiento vectorial</strong><br />
+                        Seguimiento de latencia, embeddings almacenados y recuperación semántica.
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-3 mb-3">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <h6>Total usuarios</h6>
-                    <h3>@ViewBag.TotalUsuarios</h3>
-                </div>
-            </div>
-        </div>
+        <div class="col-lg-6">
+            <div class="vm-panel">
+                <h5>Base vectorial y agente conversacional</h5>
 
-        <div class="col-md-3 mb-3">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <h6>Consultas agente</h6>
-                    <h3>@ViewBag.TotalConsultas</h3>
-                </div>
-            </div>
-        </div>
+                <p class="text-muted mb-3">
+                    VitaMind utiliza Supabase con pgVector para almacenar embeddings y permitir búsquedas
+                    por similitud semántica. El agente conversacional se conecta mediante n8n para consultar
+                    información registrada por los usuarios.
+                </p>
 
-        <div class="col-md-3 mb-3">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <h6>Errores</h6>
-                    <h3>@ViewBag.Errores</h3>
+                <div class="vm-list-item">
+                    <div class="vm-list-icon">✓</div>
+                    <div>
+                        <strong>Registros estructurados</strong><br />
+                        Usuarios, roles, logs, errores y métricas se almacenan para el control administrativo.
+                    </div>
+                </div>
+
+                <div class="vm-list-item">
+                    <div class="vm-list-icon">⌕</div>
+                    <div>
+                        <strong>Recuperación semántica</strong><br />
+                        El sistema busca registros relacionados por significado, no solo por coincidencia exacta.
+                    </div>
                 </div>
             </div>
         </div>
 
     </div>
 
-    <div class="row mt-3">
-
-        <div class="col-md-4 mb-3">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h6>Latencia promedio</h6>
-                    <p>@ViewBag.LatenciaPromedio ms</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h6>Tasa de éxito</h6>
-                    <p>@ViewBag.TasaExito %</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h6>Vectores almacenados</h6>
-                    <p>@ViewBag.Vectores</p>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="mt-4">
-        <a asp-controller="RegistrosSalud" asp-action="Index" class="btn btn-primary">
+    <div class="vm-actions">
+        <a asp-controller="RegistrosSalud" asp-action="Index" class="btn btn-primary vm-btn">
             Ver registros
         </a>
 
-        <a asp-controller="Auth" asp-action="Logout" class="btn btn-outline-danger">
+        <a asp-controller="Chatbot" asp-action="Index" class="btn btn-outline-primary vm-btn">
+            Probar agente
+        </a>
+
+        <a asp-controller="Auth" asp-action="Logout" class="btn btn-outline-danger vm-btn">
             Cerrar sesión
         </a>
+    </div>
+
+    <div class="vm-note">
+        <strong>Nota:</strong> Este panel permite evidenciar métricas solicitadas en el proyecto, como registros,
+        errores, latencia, consultas al agente, tasa de éxito y uso de almacenamiento vectorial.
     </div>
 </div>

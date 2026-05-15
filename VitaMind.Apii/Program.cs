@@ -3,16 +3,24 @@ using Pgvector.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddControllers();
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
-        builder.Configuration.GetConnectionString("DefaultConnection")
-        ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found."),
-        o => o.UseVector()
+        builder.Configuration.GetConnectionString("AppDbContext")
+        ?? throw new InvalidOperationException("Connection string 'AppDbContext' not found."),
+        npgsqlOptions =>
+        {
+            npgsqlOptions.UseVector();
+            npgsqlOptions.CommandTimeout(120);
+            npgsqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 3,
+                maxRetryDelay: TimeSpan.FromSeconds(5),
+                errorCodesToAdd: null
+            );
+        }
     )
 );
-
-builder.Services.AddControllers();
-builder.Services.AddHttpClient();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -26,9 +34,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

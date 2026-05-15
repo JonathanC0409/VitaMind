@@ -17,6 +17,7 @@ namespace VitaMind.MVC.Controllers
         public IActionResult Index()
         {
             var rol = HttpContext.Session.GetString("Rol");
+            var idUsuarioSesion = HttpContext.Session.GetString("IdUsuario");
 
             if (string.IsNullOrEmpty(rol))
             {
@@ -24,6 +25,19 @@ namespace VitaMind.MVC.Controllers
             }
 
             var registros = CRUD<RegistroSalud>.GetAll();
+
+            if (rol == "Cliente")
+            {
+                if (string.IsNullOrEmpty(idUsuarioSesion))
+                {
+                    return RedirectToAction("Login", "Auth");
+                }
+
+                registros = registros
+                    .Where(r => r.IdUsuario.ToString() == idUsuarioSesion)
+                    .ToList();
+            }
+
             return View(registros);
         }
 

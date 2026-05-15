@@ -1,78 +1,354 @@
-﻿@model VitaMind.Models.RegistroSalud
+﻿@model List<VitaMind.Models.RegistroSalud>
 
 @{
-    ViewData["Title"] = "Nuevo Registro de Salud";
+    ViewData["Title"] = "Historial de Registros - VitaMind";
 }
 
-<div class="container mt-4">
-    <h2>Nuevo Registro de Salud</h2>
-
-    @if (ViewBag.Error != null)
-    {
-        <div class="alert alert-danger">
-            @ViewBag.Error
-        </div>
+<style>
+    body {
+        background: #f4f8fb;
     }
 
-    @if (TempData["Mensaje"] != null)
-    {
-        <div class="alert alert-success">
-            @TempData["Mensaje"]
-        </div>
+    .vm-container {
+        max-width: 1200px;
+        margin: 0 auto;
     }
 
-    <div class="alert alert-warning">
-        VitaMind no realiza diagnósticos médicos. La información registrada es solo para seguimiento personal.
+    .vm-header {
+        background: linear-gradient(135deg, #e9f9f4 0%, #eef6ff 60%, #ffffff 100%);
+        border: 1px solid #dcefed;
+        border-radius: 26px;
+        padding: 30px;
+        margin-bottom: 26px;
+        box-shadow: 0 10px 28px rgba(19, 80, 96, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .vm-header::after {
+            content: "";
+            position: absolute;
+            width: 230px;
+            height: 230px;
+            border-radius: 50%;
+            background: rgba(13, 110, 253, 0.10);
+            right: -70px;
+            top: -80px;
+        }
+
+    .vm-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #ffffff;
+        color: #0d6efd;
+        border: 1px solid #d4e6ff;
+        padding: 8px 14px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 650;
+        margin-bottom: 14px;
+    }
+
+    .vm-header h1 {
+        color: #12343b;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .vm-header p {
+        color: #52656b;
+        font-size: 1.03rem;
+        max-width: 760px;
+        margin-bottom: 0;
+    }
+
+    .vm-actions-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 22px;
+    }
+
+    .vm-btn {
+        border-radius: 14px;
+        padding: 10px 18px;
+        font-weight: 650;
+    }
+
+    .vm-summary-card {
+        background: #ffffff;
+        border: 1px solid #e2edf0;
+        border-radius: 20px;
+        padding: 18px;
+        box-shadow: 0 8px 22px rgba(15, 56, 66, 0.06);
+        margin-bottom: 22px;
+    }
+
+    .vm-summary-number {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #087f5b;
+        margin-bottom: 0;
+    }
+
+    .vm-summary-label {
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+
+    .vm-empty {
+        background: #ffffff;
+        border: 1px solid #e2edf0;
+        border-radius: 24px;
+        padding: 36px;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(15, 56, 66, 0.07);
+    }
+
+    .vm-empty-icon {
+        font-size: 48px;
+        margin-bottom: 14px;
+    }
+
+    .vm-table-card {
+        background: #ffffff;
+        border: 1px solid #e2edf0;
+        border-radius: 24px;
+        box-shadow: 0 10px 25px rgba(15, 56, 66, 0.08);
+        overflow: hidden;
+    }
+
+    .vm-table-header {
+        background: #ffffff;
+        padding: 20px 22px;
+        border-bottom: 1px solid #e9eef1;
+    }
+
+        .vm-table-header h5 {
+            color: #173b43;
+            font-weight: 750;
+            margin-bottom: 4px;
+        }
+
+        .vm-table-header small {
+            color: #6c757d;
+        }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+        .table thead th {
+            background: #f8fbfc;
+            color: #173b43;
+            font-size: 0.88rem;
+            text-transform: uppercase;
+            letter-spacing: 0.02rem;
+            border-bottom: 1px solid #e1eaee;
+            padding: 14px;
+        }
+
+        .table tbody td {
+            vertical-align: middle;
+            padding: 14px;
+            color: #405158;
+        }
+
+    .vm-category {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 50px;
+        background: #e9f9f4;
+        color: #087f5b;
+        font-weight: 650;
+        font-size: 0.85rem;
+    }
+
+    .vm-status {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 50px;
+        background: #e7f1ff;
+        color: #0d6efd;
+        font-weight: 650;
+        font-size: 0.85rem;
+    }
+
+    .vm-description {
+        max-width: 360px;
+        color: #52656b;
+    }
+
+    .vm-footer-note {
+        margin-top: 22px;
+        background: #ffffff;
+        border-left: 5px solid #20c997;
+        border-radius: 14px;
+        padding: 15px;
+        color: #52656b;
+        box-shadow: 0 6px 18px rgba(15, 56, 66, 0.05);
+    }
+
+    .fade-in {
+        animation: fadeIn 0.45s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<div class="container mt-4 vm-container fade-in">
+
+    <section class="vm-header">
+        <div class="vm-badge">
+            <span>📋</span>
+            <span>Historial personal</span>
+        </div>
+
+        <h1>Registros de Salud</h1>
+
+        <p>
+            Consulta los registros almacenados en VitaMind. Esta información forma parte del seguimiento personal
+            y puede ser utilizada por el agente conversacional para realizar búsquedas semánticas.
+        </p>
+    </section>
+
+    <div class="vm-actions-top">
+        <div>
+            <a asp-controller="RegistrosSalud" asp-action="Create" class="btn btn-success vm-btn">
+                Nuevo registro
+            </a>
+
+            <a asp-controller="Cliente" asp-action="Index" class="btn btn-outline-secondary vm-btn">
+                Volver al panel
+            </a>
+        </div>
     </div>
 
-    <form asp-controller="RegistrosSalud" asp-action="Create" method="post">
+    @if (Model == null || !Model.Any())
+    {
+        <div class="vm-empty">
+            <div class="vm-empty-icon">🩺</div>
+            <h4>No existen registros disponibles</h4>
+            <p class="text-muted">
+                Todavía no se han registrado hábitos, síntomas o datos de bienestar personal.
+            </p>
 
-        <div class="mb-3">
-            <label class="form-label">Categoría</label>
-            <select asp-for="Categoria" class="form-control">
-                <option value="">Seleccione una categoría</option>
-                <option value="Sueño">Sueño</option>
-                <option value="Hidratación">Hidratación</option>
-                <option value="Alimentación">Alimentación</option>
-                <option value="Ejercicio">Ejercicio</option>
-                <option value="Síntomas">Síntomas</option>
-                <option value="Estado emocional">Estado emocional</option>
-                <option value="Hábitos generales">Hábitos generales</option>
-            </select>
+            <a asp-controller="RegistrosSalud" asp-action="Create" class="btn btn-primary vm-btn">
+                Crear primer registro
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="vm-summary-card">
+                    <p class="vm-summary-number">@Model.Count</p>
+                    <p class="vm-summary-label">Registros visualizados</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="vm-summary-card">
+                    <p class="vm-summary-number">
+                        @Model.Count(x => x.EstadoInsercion == "Insertado")
+                    </p>
+                    <p class="vm-summary-label">Registros insertados correctamente</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="vm-summary-card">
+                    <p class="vm-summary-number">
+                        @(Model.Any() ? Math.Round(Model.Average(x => x.LatenciaMs), 2) : 0)
+                    </p>
+                    <p class="vm-summary-label">Latencia promedio en ms</p>
+                </div>
+            </div>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">Descripción</label>
-            <textarea asp-for="Descripcion"
-                      class="form-control"
-                      rows="4"
-                      placeholder="Ejemplo: Dormí 5 horas y amanecí cansado."></textarea>
+        <div class="vm-table-card">
+            <div class="vm-table-header">
+                <h5>Historial de bienestar</h5>
+                <small>Registros ingresados por formulario o agente conversacional.</small>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Categoría</th>
+                            <th>Descripción</th>
+                            <th>Intensidad</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th>Latencia</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="vm-category">@item.Categoria</span>
+                                </td>
+
+                                <td>
+                                    <div class="vm-description">
+                                        @item.Descripcion
+                                    </div>
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(item.Intensidad) ? "No registrada" : item.Intensidad)
+                                </td>
+
+                                <td>
+                                    @item.FechaRegistro.ToShortDateString()
+                                </td>
+
+                                <td>
+                                    <span class="vm-status">@item.EstadoInsercion</span>
+                                </td>
+
+                                <td>
+                                    @item.LatenciaMs ms
+                                </td>
+
+                                <td class="text-center">
+                                    <a asp-action="Details" asp-route-id="@item.IdRegistro" class="btn btn-sm btn-outline-info">
+                                        Ver
+                                    </a>
+
+                                    <a asp-action="Delete" asp-route-id="@item.IdRegistro" class="btn btn-sm btn-outline-danger">
+                                        Eliminar
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">Intensidad</label>
-            <select asp-for="Intensidad" class="form-control">
-                <option value="">Seleccione intensidad</option>
-                <option value="Baja">Baja</option>
-                <option value="Media">Media</option>
-                <option value="Alta">Alta</option>
-            </select>
+        <div class="vm-footer-note">
+            <strong>Nota:</strong> Los registros aquí mostrados pueden ser consultados posteriormente mediante el agente conversacional.
+            VitaMind no realiza diagnósticos médicos; solo organiza información personal para seguimiento y análisis académico.
         </div>
-
-        <div class="mb-3">
-            <label class="form-label">Observación</label>
-            <textarea asp-for="Observacion"
-                      class="form-control"
-                      rows="3"
-                      placeholder="Ejemplo: Me pasó después de estudiar o trabajar."></textarea>
-        </div>
-
-        <button type="submit" class="btn btn-primary">
-            Guardar registro con n8n
-        </button>
-
-        <a asp-action="Index" class="btn btn-secondary">
-            Cancelar
-        </a>
-    </form>
+    }
 </div>

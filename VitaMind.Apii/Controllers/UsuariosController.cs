@@ -72,11 +72,47 @@ namespace VitaMind.Apii.Controllers
             return NoContent();
         }
 
+        // POST: api/Usuarios/login
+        [HttpPost("login")]
+        public async Task<ActionResult<Usuario>> Login([FromBody] Usuario login)
+        {
+            if (string.IsNullOrWhiteSpace(login.Correo) || string.IsNullOrWhiteSpace(login.PasswordHash))
+            {
+                return BadRequest("Correo y contraseña son obligatorios.");
+            }
+
+            var usuario = await _context.Usuarios
+                .FirstOrDefaultAsync(u =>
+                    u.Correo == login.Correo &&
+                    u.PasswordHash == login.PasswordHash &&
+                    u.Estado == "Activo");
+
+            if (usuario == null)
+            {
+                return Unauthorized("Credenciales incorrectas.");
+            }
+
+            return Ok(usuario);
+        }
+
         // POST: api/Usuarios
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // POST: api/Usuarios
         [HttpPost]
         public async Task<ActionResult<Usuario>> PostUsuario(Usuario usuario)
         {
+            if (usuario.IdUsuario == Guid.Empty)
+            {
+                usuario.IdUsuario = Guid.NewGuid();
+            }
+
+            usuario.FechaRegistro = DateTime.UtcNow;
+
+            if (string.IsNullOrWhiteSpace(usuario.Estado))
+            {
+                usuario.Estado = "Activo";
+            }
+
             _context.Usuarios.Add(usuario);
             await _context.SaveChangesAsync();
 

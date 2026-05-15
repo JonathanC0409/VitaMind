@@ -27,7 +27,40 @@ namespace VitaMind.Apii.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<RegistroSalud>>> GetRegistroSalud()
         {
-            return await _context.RegistrosSalud.ToListAsync();
+            var registros = await _context.RegistrosSalud
+                .AsNoTracking()
+                .Select(r => new RegistroSalud
+                {
+                    IdRegistro = r.IdRegistro,
+                    IdUsuario = r.IdUsuario,
+                    Categoria = r.Categoria,
+                    Descripcion = r.Descripcion,
+                    Intensidad = r.Intensidad,
+                    Observacion = r.Observacion,
+                    TipoEntrada = r.TipoEntrada,
+                    FechaRegistro = r.FechaRegistro,
+                    HoraRegistro = r.HoraRegistro,
+                    EstadoInsercion = r.EstadoInsercion,
+                    LatenciaMs = r.LatenciaMs,
+                    TiempoEmbeddingMs = r.TiempoEmbeddingMs,
+
+                    // No enviar el vector al MVC
+                    Embedding = null,
+
+                    DimensionEmbedding = r.DimensionEmbedding,
+                    EsSimilar = r.EsSimilar,
+                    SimilitudDetectada = r.SimilitudDetectada,
+                    IdRegistroSimilar = r.IdRegistroSimilar,
+                    FechaCreacion = r.FechaCreacion,
+
+                    // Evitar relaciones/ciclos
+                    Usuario = null,
+                    RegistroSimilar = null,
+                    ResultadosBusqueda = null
+                })
+                .ToListAsync();
+
+            return Ok(registros);
         }
 
         // GET: api/RegistrosSalud/5
