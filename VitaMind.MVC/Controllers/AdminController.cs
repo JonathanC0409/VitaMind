@@ -1,161 +1,222 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace VitaMind.MVC.Controllers
 {
     public class AdminController : Controller
     {
-        private readonly string endpointDashboard = "https://localhost:7042/api/MetricaSistemas/dashboard-admin";
+        private readonly string apiMetricas = "https://localhost:7042/api/MetricaSistemas";
+
+        private bool EsAdministrador()
+        {
+            var rol = HttpContext.Session.GetString("Rol");
+            return rol == "Administrador";
+        }
+
+        private async Task<JObject?> ObtenerJson(string endpoint)
+        {
+            try
+            {
+                /*
+                    Este handler se usa para desarrollo local.
+                    Ayuda cuando el MVC tiene problemas al consumir HTTPS local
+                    por certificados de desarrollo.
+                    No usar así en producción.
+                */
+                var handler = new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback =
+                        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                };
+
+                using var client = new HttpClient(handler);
+                client.Timeout = TimeSpan.FromSeconds(8);
+
+                var response = await client.GetAsync(endpoint);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    ViewBag.ErrorDetalle =
+                        $"La API respondió con estado {(int)response.StatusCode} - {response.ReasonPhrase}";
+                    return null;
+                }
+
+                var json = await response.Content.ReadAsStringAsync();
+
+                if (string.IsNullOrWhiteSpace(json))
+                {
+                    ViewBag.ErrorDetalle = "La API respondió vacío.";
+                    return null;
+                }
+
+                return JObject.Parse(json);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorDetalle = "Error al conectar con la API: " + ex.Message;
+                return null;
+            }
+        }
 
         public async Task<IActionResult> Dashboard()
         {
-            var rol = HttpContext.Session.GetString("Rol");
-
-            if (rol != "Administrador")
+            if (!EsAdministrador())
             {
                 return RedirectToAction("Login", "Auth");
             }
 
             ViewBag.Nombre = HttpContext.Session.GetString("Nombre");
 
-            using var client = new HttpClient();
+            var data = await ObtenerJson($"{apiMetricas}/resumen-admin");
 
-            try
+            if (data == null)
             {
-                await client.GetAsync("https://localhost:7042/api/ServicioEstados/verificar");
-            }
-            catch
-            {
-                // Si falla la verificación, no rompemos el dashboard.
-            }
-
-            var response = await client.GetAsync(endpointDashboard);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                ViewBag.Error = "No se pudieron cargar las métricas del dashboard.";
-
-                CargarMetricasVacias();
-
+                ViewBag.Error = "No se pudieron cargar las métricas principales.";
                 return View();
             }
 
-            var json = await response.Content.ReadAsStringAsync();
-
-            var metricas = JsonConvert.DeserializeObject<DashboardAdminDto>(json);
-
-            ViewBag.TotalRegistros = metricas?.TotalRegistros ?? 0;
-            ViewBag.TotalUsuarios = metricas?.TotalUsuarios ?? 0;
-            ViewBag.TotalConsultas = metricas?.TotalConsultas ?? 0;
-            ViewBag.Errores = metricas?.Errores ?? 0;
-            ViewBag.LatenciaPromedio = metricas?.LatenciaPromedio ?? 0;
-            ViewBag.TasaExito = metricas?.TasaExito ?? 0;
-            ViewBag.TiempoConsulta = metricas?.TiempoConsulta ?? 0;
-            ViewBag.Relevancia = metricas?.Relevancia ?? 0;
-            ViewBag.RegistrosSimilares = metricas?.RegistrosSimilares ?? 0;
-            ViewBag.Vectores = metricas?.Vectores ?? 0;
-
-            // Métrica principal 10 más completa
-            ViewBag.DimensionEmbedding = metricas?.DimensionEmbedding ?? 0;
-
-            // Métricas adicionales
-            ViewBag.TiempoPromedioEmbedding = metricas?.TiempoPromedioEmbedding ?? 0;
-            ViewBag.RegistrosPorUsuario = metricas?.RegistrosPorUsuario ?? new List<RegistroPorUsuarioDto>();
-            ViewBag.ConsultasPorTipoUsuario = metricas?.ConsultasPorTipoUsuario ?? new List<ConsultaPorTipoUsuarioDto>();
-            ViewBag.PromedioSimilitudResultados = metricas?.PromedioSimilitudResultados ?? 0;
-            ViewBag.IntentosFallidosPorUsuario = metricas?.IntentosFallidosPorUsuario ?? new List<IntentoFallidoUsuarioDto>();
-            ViewBag.TopTerminosConsultados = metricas?.TopTerminosConsultados ?? new List<TopTerminoDto>();
-            ViewBag.RegistrosPorFecha = metricas?.RegistrosPorFecha ?? new List<RegistroPorFechaDto>();
-            ViewBag.EstadoServicios = metricas?.EstadoServicios ?? new List<EstadoServicioDto>();
+            ViewBag.TotalRegistros = data["totalRegistros"]?.ToObject<int>() ?? 0;
+            ViewBag.TotalUsuarios = data["totalUsuarios"]?.ToObject<int>() ?? 0;
+            ViewBag.TotalConsultas = data["totalConsultas"]?.ToObject<int>() ?? 0;
+            ViewBag.Errores = data["errores"]?.ToObject<int>() ?? 0;
+            ViewBag.TasaExito = data["tasaExito"]?.ToObject<decimal>() ?? 0;
+            ViewBag.Vectores = data["vectores"]?.ToObject<int>() ?? 0;
 
             return View();
         }
 
-        private void CargarMetricasVacias()
+        public async Task<IActionResult> MetricasRegistros()
         {
-            ViewBag.TotalRegistros = 0;
-            ViewBag.TotalUsuarios = 0;
-            ViewBag.TotalConsultas = 0;
-            ViewBag.Errores = 0;
-            ViewBag.LatenciaPromedio = 0;
-            ViewBag.TasaExito = 0;
-            ViewBag.TiempoConsulta = 0;
-            ViewBag.Relevancia = 0;
-            ViewBag.RegistrosSimilares = 0;
-            ViewBag.Vectores = 0;
-            ViewBag.DimensionEmbedding = 0;
+            if (!EsAdministrador())
+            {
+                return RedirectToAction("Login", "Auth");
+            }
 
-            ViewBag.TiempoPromedioEmbedding = 0;
-            ViewBag.RegistrosPorUsuario = new List<RegistroPorUsuarioDto>();
-            ViewBag.ConsultasPorTipoUsuario = new List<ConsultaPorTipoUsuarioDto>();
-            ViewBag.PromedioSimilitudResultados = 0;
-            ViewBag.IntentosFallidosPorUsuario = new List<IntentoFallidoUsuarioDto>();
-            ViewBag.TopTerminosConsultados = new List<TopTerminoDto>();
-            ViewBag.RegistrosPorFecha = new List<RegistroPorFechaDto>();
-            ViewBag.EstadoServicios = new List<EstadoServicioDto>();
+            var data = await ObtenerJson($"{apiMetricas}/registros");
+
+            if (data == null)
+            {
+                ViewBag.Error = "No se pudieron cargar las métricas de registros.";
+                return View();
+            }
+
+            ViewBag.TotalRegistros = data["totalRegistros"]?.ToObject<int>() ?? 0;
+            ViewBag.RegistrosPorUsuario = data["registrosPorUsuario"];
+            ViewBag.RegistrosPorFecha = data["registrosPorFecha"];
+
+            return View();
         }
 
-        private class DashboardAdminDto
+        public async Task<IActionResult> MetricasRendimiento()
         {
-            public int TotalRegistros { get; set; }
-            public int TotalUsuarios { get; set; }
-            public int TotalConsultas { get; set; }
-            public int Errores { get; set; }
-            public double LatenciaPromedio { get; set; }
-            public double TasaExito { get; set; }
-            public double TiempoConsulta { get; set; }
-            public decimal Relevancia { get; set; }
-            public int RegistrosSimilares { get; set; }
-            public int Vectores { get; set; }
-            public int DimensionEmbedding { get; set; }
+            if (!EsAdministrador())
+            {
+                return RedirectToAction("Login", "Auth");
+            }
 
-            public double TiempoPromedioEmbedding { get; set; }
-            public List<RegistroPorUsuarioDto> RegistrosPorUsuario { get; set; } = new();
-            public List<ConsultaPorTipoUsuarioDto> ConsultasPorTipoUsuario { get; set; } = new();
-            public decimal PromedioSimilitudResultados { get; set; }
-            public List<IntentoFallidoUsuarioDto> IntentosFallidosPorUsuario { get; set; } = new();
-            public List<TopTerminoDto> TopTerminosConsultados { get; set; } = new();
-            public List<RegistroPorFechaDto> RegistrosPorFecha { get; set; } = new();
-            public List<EstadoServicioDto> EstadoServicios { get; set; } = new();
+            var data = await ObtenerJson($"{apiMetricas}/rendimiento");
+
+            if (data == null)
+            {
+                ViewBag.Error = "No se pudieron cargar las métricas de rendimiento.";
+                return View();
+            }
+
+            ViewBag.LatenciaPromedio = data["latenciaPromedio"]?.ToObject<decimal>() ?? 0;
+            ViewBag.TiempoPromedioEmbedding = data["tiempoPromedioEmbedding"]?.ToObject<decimal>() ?? 0;
+            ViewBag.Vectores = data["vectores"]?.ToObject<int>() ?? 0;
+            ViewBag.DimensionEmbedding = data["dimensionEmbedding"]?.ToObject<int>() ?? 0;
+
+            return View();
         }
 
-        private class RegistroPorUsuarioDto
+        public async Task<IActionResult> MetricasCalidad()
         {
-            public string Usuario { get; set; } = string.Empty;
-            public string Rol { get; set; } = string.Empty;
-            public int TotalRegistros { get; set; }
+            if (!EsAdministrador())
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var data = await ObtenerJson($"{apiMetricas}/calidad");
+
+            if (data == null)
+            {
+                ViewBag.Error = "No se pudieron cargar las métricas de calidad.";
+                return View();
+            }
+
+            ViewBag.Errores = data["errores"]?.ToObject<int>() ?? 0;
+            ViewBag.TasaExito = data["tasaExito"]?.ToObject<decimal>() ?? 0;
+            ViewBag.RegistrosSimilares = data["registrosSimilares"]?.ToObject<int>() ?? 0;
+            ViewBag.IntentosFallidosPorUsuario = data["intentosFallidosPorUsuario"];
+
+            return View();
         }
 
-        private class ConsultaPorTipoUsuarioDto
+        public async Task<IActionResult> MetricasSemantica()
         {
-            public string TipoUsuario { get; set; } = string.Empty;
-            public int TotalConsultas { get; set; }
+            if (!EsAdministrador())
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var data = await ObtenerJson($"{apiMetricas}/semantica");
+
+            if (data == null)
+            {
+                ViewBag.Error = "No se pudieron cargar las métricas semánticas.";
+                return View();
+            }
+
+            ViewBag.TiempoConsulta = data["tiempoConsulta"]?.ToObject<decimal>() ?? 0;
+            ViewBag.Relevancia = data["relevancia"]?.ToObject<decimal>() ?? 0;
+            ViewBag.PromedioSimilitudResultados = data["promedioSimilitudResultados"]?.ToObject<decimal>() ?? 0;
+            ViewBag.TotalBusquedas = data["totalBusquedas"]?.ToObject<int>() ?? 0;
+            ViewBag.TotalResultados = data["totalResultados"]?.ToObject<int>() ?? 0;
+
+            return View();
         }
 
-        private class IntentoFallidoUsuarioDto
+        public async Task<IActionResult> MetricasAgente()
         {
-            public string Usuario { get; set; } = string.Empty;
-            public int TotalErrores { get; set; }
+            if (!EsAdministrador())
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var data = await ObtenerJson($"{apiMetricas}/agente");
+
+            if (data == null)
+            {
+                ViewBag.Error = "No se pudieron cargar las métricas del agente.";
+                return View();
+            }
+
+            ViewBag.TotalConsultas = data["totalConsultas"]?.ToObject<int>() ?? 0;
+            ViewBag.ConsultasPorTipoUsuario = data["consultasPorTipoUsuario"];
+            ViewBag.TopTerminosConsultados = data["topTerminosConsultados"];
+
+            return View();
         }
 
-        private class TopTerminoDto
+        public async Task<IActionResult> MetricasServicios()
         {
-            public string Termino { get; set; } = string.Empty;
-            public int Cantidad { get; set; }
-        }
+            if (!EsAdministrador())
+            {
+                return RedirectToAction("Login", "Auth");
+            }
 
-        private class RegistroPorFechaDto
-        {
-            public DateTime Fecha { get; set; }
-            public int TotalRegistros { get; set; }
-        }
+            var data = await ObtenerJson($"{apiMetricas}/servicios");
 
-        private class EstadoServicioDto
-        {
-            public string Servicio { get; set; } = string.Empty;
-            public string Estado { get; set; } = string.Empty;
-            public DateTime UltimoChequeo { get; set; }
-            public string? Mensaje { get; set; }
+            if (data == null)
+            {
+                ViewBag.Error = "No se pudieron cargar las métricas de servicios.";
+                return View();
+            }
+
+            ViewBag.EstadoServicios = data["estadoServicios"];
+
+            return View();
         }
     }
 }

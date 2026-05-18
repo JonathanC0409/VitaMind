@@ -39,6 +39,7 @@ namespace VitaMind.MVC.Controllers
                 };
 
                 using var client = new HttpClient();
+                client.Timeout = TimeSpan.FromSeconds(5);
 
                 var content = new StringContent(
                     JsonConvert.SerializeObject(login),

@@ -88,9 +88,9 @@ namespace VitaMind.Apii.Controllers
             try
             {
                 using var client = new HttpClient();
-                client.Timeout = TimeSpan.FromSeconds(3);
+                client.Timeout = TimeSpan.FromMilliseconds(700);
 
-                var response = await client.GetAsync("http://localhost:5678");
+                var response = await client.GetAsync("https://jonathanc040903.app.n8n.cloud");
 
                 await CrearOActualizarServicio(
                     "n8n",

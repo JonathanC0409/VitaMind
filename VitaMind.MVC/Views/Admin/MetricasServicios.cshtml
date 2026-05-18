@@ -1,0 +1,586 @@
+﻿@using Newtonsoft.Json.Linq
+
+@{
+    ViewData["Title"] = "Estado de Servicios - VitaMind";
+
+    var estadoServicios = ViewBag.EstadoServicios as JArray;
+
+    int totalServicios = estadoServicios?.Count ?? 0;
+    int serviciosActivos = 0;
+    int serviciosError = 0;
+    int serviciosNoConfigurados = 0;
+
+    if (estadoServicios != null)
+    {
+        foreach (var item in estadoServicios)
+        {
+            var estado = item["estado"]?.ToString() ?? "";
+
+            if (estado == "Activo")
+            {
+                serviciosActivos++;
+            }
+            else if (estado == "Error")
+            {
+                serviciosError++;
+            }
+            else
+            {
+                serviciosNoConfigurados++;
+            }
+        }
+    }
+}
+
+<style>
+    body {
+        background: #f4f8fb;
+    }
+
+    .vm-admin-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .vm-hero {
+        background: linear-gradient(135deg, #fff8db 0%, #eef6ff 55%, #ffffff 100%);
+        border: 1px solid #f1e6bd;
+        border-radius: 26px;
+        padding: 32px;
+        margin-bottom: 26px;
+        box-shadow: 0 10px 28px rgba(96, 76, 19, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .vm-hero::after {
+            content: "";
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: rgba(255, 193, 7, 0.16);
+            right: -75px;
+            top: -85px;
+        }
+
+    .vm-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #ffffff;
+        color: #9a7a00;
+        border: 1px solid #eadb9b;
+        padding: 8px 14px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 650;
+        margin-bottom: 14px;
+    }
+
+    .vm-hero h1 {
+        color: #12343b;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .vm-hero p {
+        color: #52656b;
+        font-size: 1.03rem;
+        max-width: 860px;
+        margin-bottom: 0;
+    }
+
+    .vm-section-title {
+        color: #173b43;
+        font-weight: 800;
+        margin-bottom: 16px;
+    }
+
+    .vm-metric-card {
+        background: #ffffff;
+        border: 1px solid #e2edf0;
+        border-radius: 22px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(15, 56, 66, 0.07);
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.25s ease;
+    }
+
+        .vm-metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 34px rgba(15, 56, 66, 0.12);
+        }
+
+        .vm-metric-card::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 5px;
+            left: 0;
+            top: 0;
+        }
+
+        .vm-metric-card.primary::before {
+            background: #0d6efd;
+        }
+
+        .vm-metric-card.success::before {
+            background: #20c997;
+        }
+
+        .vm-metric-card.danger::before {
+            background: #dc3545;
+        }
+
+        .vm-metric-card.warning::before {
+            background: #ffc107;
+        }
+
+    .vm-icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 14px;
+    }
+
+    .vm-icon-blue {
+        background: #e7f1ff;
+        color: #0d6efd;
+    }
+
+    .vm-icon-green {
+        background: #e9f9f4;
+        color: #087f5b;
+    }
+
+    .vm-icon-red {
+        background: #fff0f1;
+        color: #dc3545;
+    }
+
+    .vm-icon-yellow {
+        background: #fff8db;
+        color: #9a7a00;
+    }
+
+    .vm-metric-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 650;
+        margin-bottom: 8px;
+    }
+
+    .vm-metric-value {
+        color: #12343b;
+        font-size: 2.2rem;
+        font-weight: 850;
+        margin-bottom: 4px;
+    }
+
+    .vm-metric-help {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0;
+    }
+
+    .vm-panel {
+        background: #ffffff;
+        border: 1px solid #e2edf0;
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(15, 56, 66, 0.07);
+        margin-top: 26px;
+    }
+
+        .vm-panel h5 {
+            color: #173b43;
+            font-weight: 800;
+            margin-bottom: 14px;
+        }
+
+        .vm-panel p {
+            color: #52656b;
+        }
+
+    .vm-table {
+        margin-bottom: 0;
+    }
+
+        .vm-table thead th {
+            background: #fffaf0;
+            color: #173b43;
+            font-weight: 800;
+            border-bottom: 1px solid #efe3bf;
+            padding: 14px;
+        }
+
+        .vm-table tbody td {
+            padding: 14px;
+            color: #455a64;
+            vertical-align: middle;
+        }
+
+        .vm-table tbody tr:hover {
+            background: #fffdf5;
+        }
+
+    .vm-status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 13px;
+        border-radius: 999px;
+        font-weight: 800;
+        font-size: 0.86rem;
+        white-space: nowrap;
+    }
+
+    .vm-status-active {
+        background: #e9f9f4;
+        color: #087f5b;
+    }
+
+    .vm-status-error {
+        background: #fff0f1;
+        color: #dc3545;
+    }
+
+    .vm-status-warning {
+        background: #fff8db;
+        color: #9a7a00;
+    }
+
+    .vm-service-name {
+        font-weight: 800;
+        color: #173b43;
+    }
+
+    .vm-message {
+        color: #52656b;
+        font-size: 0.92rem;
+        line-height: 1.4;
+    }
+
+    .vm-info-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-top: 18px;
+    }
+
+    .vm-info-box {
+        background: #f8fbfd;
+        border: 1px solid #e2edf0;
+        border-radius: 18px;
+        padding: 18px;
+        height: 100%;
+    }
+
+    .vm-info-title {
+        color: #173b43;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .vm-info-text {
+        color: #6c757d;
+        margin-bottom: 0;
+        font-size: 0.9rem;
+    }
+
+    .vm-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 13px;
+        border-radius: 999px;
+        background: #fff8db;
+        color: #9a7a00;
+        font-weight: 750;
+        font-size: 0.88rem;
+        margin: 4px;
+    }
+
+    .vm-note {
+        margin-top: 24px;
+        background: #ffffff;
+        border-left: 5px solid #ffc107;
+        border-radius: 14px;
+        padding: 15px;
+        color: #52656b;
+        box-shadow: 0 6px 18px rgba(15, 56, 66, 0.05);
+    }
+
+    .vm-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 28px;
+    }
+
+    .vm-btn {
+        border-radius: 14px;
+        padding: 11px 18px;
+        font-weight: 650;
+    }
+
+    .fade-in {
+        animation: fadeIn 0.45s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@media (max-width: 992px) {
+        .vm-info-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .vm-info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="container mt-4 vm-admin-container fade-in">
+
+    <section class="vm-hero">
+        <div class="vm-badge">
+            <span>🟢</span>
+            <span>Estado de servicios</span>
+        </div>
+
+        <h1>Monitoreo técnico de servicios conectados</h1>
+
+        <p>
+            Esta sección permite revisar la disponibilidad de los servicios principales de VitaMind.
+            Aquí se visualiza el estado de la API .NET, Supabase Vector, n8n y OpenAI API, junto con
+            el último chequeo y el mensaje técnico registrado.
+        </p>
+    </section>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-warning rounded-4">
+            @ViewBag.Error
+        </div>
+    }
+
+    <h4 class="vm-section-title">Resumen de disponibilidad</h4>
+
+    <div class="row g-4">
+
+        <div class="col-lg-3 col-md-6">
+            <div class="vm-metric-card primary">
+                <div class="vm-icon-box vm-icon-blue">🧩</div>
+                <div class="vm-metric-label">Servicios monitoreados</div>
+                <div class="vm-metric-value">@totalServicios</div>
+                <p class="vm-metric-help">
+                    Total de servicios registrados en el monitoreo técnico.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="vm-metric-card success">
+                <div class="vm-icon-box vm-icon-green">✅</div>
+                <div class="vm-metric-label">Servicios activos</div>
+                <div class="vm-metric-value">@serviciosActivos</div>
+                <p class="vm-metric-help">
+                    Servicios disponibles y funcionando correctamente.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="vm-metric-card danger">
+                <div class="vm-icon-box vm-icon-red">⚠️</div>
+                <div class="vm-metric-label">Servicios con error</div>
+                <div class="vm-metric-value">@serviciosError</div>
+                <p class="vm-metric-help">
+                    Servicios que no respondieron o presentan fallos.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="vm-metric-card warning">
+                <div class="vm-icon-box vm-icon-yellow">🔧</div>
+                <div class="vm-metric-label">No configurados</div>
+                <div class="vm-metric-value">@serviciosNoConfigurados</div>
+                <p class="vm-metric-help">
+                    Servicios pendientes de configuración o validación.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="vm-panel">
+        <h5>Relación de esta métrica con el sistema</h5>
+
+        <p>
+            El estado de disponibilidad del servicio permite explicar si los componentes externos y técnicos
+            necesarios para VitaMind están funcionando correctamente. Esta métrica se relaciona directamente
+            con el registro de hábitos, las búsquedas semánticas y el agente conversacional.
+        </p>
+
+        <div class="d-flex flex-wrap">
+            <span class="vm-pill">API .NET</span>
+            <span class="vm-pill">Supabase Vector</span>
+            <span class="vm-pill">n8n</span>
+            <span class="vm-pill">OpenAI API</span>
+        </div>
+    </div>
+
+    <div class="vm-panel">
+        <h5>Detalle de servicios monitoreados</h5>
+
+        <div class="table-responsive">
+            <table class="table vm-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Servicio</th>
+                        <th>Estado</th>
+                        <th>Último chequeo</th>
+                        <th>Mensaje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (estadoServicios != null && estadoServicios.Count > 0)
+                    {
+                        foreach (var item in estadoServicios)
+                        {
+                            var servicio = item["servicio"]?.ToString() ?? "Servicio no identificado";
+                            var estado = item["estado"]?.ToString() ?? "Sin estado";
+                            var mensaje = item["mensaje"]?.ToString() ?? "Sin mensaje";
+                            var ultimoChequeoTexto = item["ultimoChequeo"]?.ToString();
+                            var ultimoChequeoFormateado = ultimoChequeoTexto;
+
+                            if (DateTime.TryParse(ultimoChequeoTexto, out DateTime fecha))
+                            {
+                                ultimoChequeoFormateado = fecha.ToString("dd/MM/yyyy HH:mm");
+                            }
+
+                            <tr>
+                                <td>
+                                    <span class="vm-service-name">@servicio</span>
+                                </td>
+
+                                <td>
+                                    @if (estado == "Activo")
+                                    {
+                                        <span class="vm-status-badge vm-status-active">● Activo</span>
+                                    }
+                                    else if (estado == "Error")
+                                    {
+                                        <span class="vm-status-badge vm-status-error">● Error</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="vm-status-badge vm-status-warning">● @estado</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @ultimoChequeoFormateado
+                                </td>
+
+                                <td>
+                                    <span class="vm-message">@mensaje</span>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-muted">
+                                No existen servicios registrados.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <div class="vm-panel">
+        <h5>Interpretación de servicios</h5>
+
+        <div class="vm-info-grid">
+
+            <div class="vm-info-box">
+                <div class="vm-info-title">API .NET</div>
+                <p class="vm-info-text">
+                    Servicio backend encargado de consultar, insertar y calcular métricas del sistema.
+                </p>
+            </div>
+
+            <div class="vm-info-box">
+                <div class="vm-info-title">Supabase Vector</div>
+                <p class="vm-info-text">
+                    Base de datos PostgreSQL con pgVector donde se almacenan registros, metadatos y vectores.
+                </p>
+            </div>
+
+            <div class="vm-info-box">
+                <div class="vm-info-title">n8n</div>
+                <p class="vm-info-text">
+                    Servicio de automatización utilizado para conectar el flujo del agente conversacional.
+                </p>
+            </div>
+
+            <div class="vm-info-box">
+                <div class="vm-info-title">OpenAI API</div>
+                <p class="vm-info-text">
+                    Servicio utilizado para apoyar el procesamiento del agente conversacional o generación de respuestas.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="vm-note">
+        <strong>Interpretación:</strong> si un servicio aparece como error o no configurado, no significa que todo el sistema
+        esté dañado. Indica que un componente específico no respondió o no está disponible en ese momento.
+        Por ejemplo, si n8n está apagado, el sistema puede seguir registrando datos mediante la API, pero el agente puede fallar.
+    </div>
+
+    <div class="vm-actions">
+        <a asp-controller="Admin" asp-action="MetricasAgente" class="btn btn-outline-secondary vm-btn">
+            ← Volver al agente
+        </a>
+
+        <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-primary vm-btn">
+            Dashboard principal
+        </a>
+
+        <a asp-controller="RegistrosSalud" asp-action="Index" class="btn btn-primary vm-btn">
+            Ver registros
+        </a>
+
+        <a asp-controller="Auth" asp-action="Logout" class="btn btn-outline-danger vm-btn">
+            Cerrar sesión
+        </a>
+    </div>
+
+</div>

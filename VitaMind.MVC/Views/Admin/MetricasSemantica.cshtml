@@ -1,0 +1,538 @@
+﻿@{
+    ViewData["Title"] = "Búsqueda Semántica - VitaMind";
+}
+
+<style>
+    body {
+        background: #f4f8fb;
+    }
+
+    .vm-admin-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .vm-hero {
+        background: linear-gradient(135deg, #f3ecff 0%, #eef6ff 55%, #ffffff 100%);
+        border: 1px solid #e1d3f7;
+        border-radius: 26px;
+        padding: 32px;
+        margin-bottom: 26px;
+        box-shadow: 0 10px 28px rgba(57, 28, 92, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .vm-hero::after {
+            content: "";
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: rgba(111, 66, 193, 0.12);
+            right: -75px;
+            top: -85px;
+        }
+
+    .vm-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #ffffff;
+        color: #6f42c1;
+        border: 1px solid #dfcff7;
+        padding: 8px 14px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 650;
+        margin-bottom: 14px;
+    }
+
+    .vm-hero h1 {
+        color: #12343b;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .vm-hero p {
+        color: #52656b;
+        font-size: 1.03rem;
+        max-width: 860px;
+        margin-bottom: 0;
+    }
+
+    .vm-section-title {
+        color: #173b43;
+        font-weight: 800;
+        margin-bottom: 16px;
+    }
+
+    .vm-metric-card {
+        background: #ffffff;
+        border: 1px solid #e2edf0;
+        border-radius: 22px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(15, 56, 66, 0.07);
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.25s ease;
+    }
+
+        .vm-metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 34px rgba(15, 56, 66, 0.12);
+        }
+
+        .vm-metric-card::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 5px;
+            left: 0;
+            top: 0;
+        }
+
+        .vm-metric-card.purple::before {
+            background: #6f42c1;
+        }
+
+        .vm-metric-card.info::before {
+            background: #0dcaf0;
+        }
+
+        .vm-metric-card.success::before {
+            background: #20c997;
+        }
+
+        .vm-metric-card.primary::before {
+            background: #0d6efd;
+        }
+
+        .vm-metric-card.warning::before {
+            background: #ffc107;
+        }
+
+    .vm-icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 14px;
+    }
+
+    .vm-icon-purple {
+        background: #f3ecff;
+        color: #6f42c1;
+    }
+
+    .vm-icon-cyan {
+        background: #e6f8fb;
+        color: #0dcaf0;
+    }
+
+    .vm-icon-green {
+        background: #e9f9f4;
+        color: #087f5b;
+    }
+
+    .vm-icon-blue {
+        background: #e7f1ff;
+        color: #0d6efd;
+    }
+
+    .vm-icon-yellow {
+        background: #fff8db;
+        color: #9a7a00;
+    }
+
+    .vm-metric-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 650;
+        margin-bottom: 8px;
+    }
+
+    .vm-metric-value {
+        color: #12343b;
+        font-size: 2rem;
+        font-weight: 850;
+        margin-bottom: 4px;
+    }
+
+    .vm-metric-help {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0;
+    }
+
+    .vm-panel {
+        background: #ffffff;
+        border: 1px solid #e2edf0;
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(15, 56, 66, 0.07);
+        margin-top: 26px;
+    }
+
+        .vm-panel h5 {
+            color: #173b43;
+            font-weight: 800;
+            margin-bottom: 14px;
+        }
+
+        .vm-panel p {
+            color: #52656b;
+        }
+
+    .vm-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 13px;
+        border-radius: 999px;
+        background: #f3ecff;
+        color: #6f42c1;
+        font-weight: 750;
+        font-size: 0.88rem;
+        margin: 4px;
+    }
+
+    .vm-flow {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 14px;
+        margin-top: 18px;
+    }
+
+    .vm-flow-step {
+        background: #f8fbfd;
+        border: 1px solid #e2edf0;
+        border-radius: 18px;
+        padding: 18px;
+        text-align: center;
+        height: 100%;
+    }
+
+    .vm-flow-number {
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+        background: #f3ecff;
+        color: #6f42c1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .vm-flow-title {
+        color: #173b43;
+        font-weight: 800;
+        margin-bottom: 6px;
+    }
+
+    .vm-flow-text {
+        color: #6c757d;
+        font-size: 0.88rem;
+        margin-bottom: 0;
+    }
+
+    .vm-info-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-top: 18px;
+    }
+
+    .vm-info-box {
+        background: #f8fbfd;
+        border: 1px solid #e2edf0;
+        border-radius: 18px;
+        padding: 18px;
+        height: 100%;
+    }
+
+    .vm-info-title {
+        color: #173b43;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .vm-info-text {
+        color: #6c757d;
+        margin-bottom: 0;
+        font-size: 0.92rem;
+    }
+
+    .vm-note {
+        margin-top: 24px;
+        background: #ffffff;
+        border-left: 5px solid #6f42c1;
+        border-radius: 14px;
+        padding: 15px;
+        color: #52656b;
+        box-shadow: 0 6px 18px rgba(15, 56, 66, 0.05);
+    }
+
+    .vm-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 28px;
+    }
+
+    .vm-btn {
+        border-radius: 14px;
+        padding: 11px 18px;
+        font-weight: 650;
+    }
+
+    .fade-in {
+        animation: fadeIn 0.45s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@media (max-width: 992px) {
+        .vm-flow {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .vm-info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .vm-flow {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="container mt-4 vm-admin-container fade-in">
+
+    <section class="vm-hero">
+        <div class="vm-badge">
+            <span>🔎</span>
+            <span>Búsqueda semántica</span>
+        </div>
+
+        <h1>Análisis de recuperación semántica</h1>
+
+        <p>
+            Esta sección muestra cómo VitaMind recupera información usando similitud semántica.
+            Aquí se analiza el tiempo promedio de búsqueda, la relevancia de recuperación,
+            el promedio de similitud y la cantidad de búsquedas y resultados generados.
+        </p>
+    </section>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-warning rounded-4">
+            @ViewBag.Error
+        </div>
+    }
+
+    <h4 class="vm-section-title">Métricas principales de búsqueda semántica</h4>
+
+    <div class="row g-4">
+
+        <div class="col-lg-4 col-md-6">
+            <div class="vm-metric-card info">
+                <div class="vm-icon-box vm-icon-cyan">⏱️</div>
+                <div class="vm-metric-label">Tiempo consulta semántica</div>
+                <div class="vm-metric-value">@(ViewBag.TiempoConsulta ?? 0)</div>
+                <p class="vm-metric-help">
+                    Tiempo promedio que tarda el sistema en recuperar información usando búsqueda vectorial, en ms.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+            <div class="vm-metric-card purple">
+                <div class="vm-icon-box vm-icon-purple">📈</div>
+                <div class="vm-metric-label">Relevancia de recuperación</div>
+                <div class="vm-metric-value">@(ViewBag.Relevancia ?? 0)</div>
+                <p class="vm-metric-help">
+                    Nivel estimado de coincidencia entre la consulta y los registros recuperados.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-12">
+            <div class="vm-metric-card success">
+                <div class="vm-icon-box vm-icon-green">🔗</div>
+                <div class="vm-metric-label">Promedio similitud semántica</div>
+                <div class="vm-metric-value">@(ViewBag.PromedioSimilitudResultados ?? 0)</div>
+                <p class="vm-metric-help">
+                    Promedio de similitud entre las consultas y los resultados encontrados.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row g-4 mt-2">
+
+        <div class="col-lg-6 col-md-6">
+            <div class="vm-metric-card primary">
+                <div class="vm-icon-box vm-icon-blue">🧭</div>
+                <div class="vm-metric-label">Total de búsquedas</div>
+                <div class="vm-metric-value">@(ViewBag.TotalBusquedas ?? 0)</div>
+                <p class="vm-metric-help">
+                    Cantidad total de consultas semánticas realizadas en el sistema.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-6">
+            <div class="vm-metric-card warning">
+                <div class="vm-icon-box vm-icon-yellow">📚</div>
+                <div class="vm-metric-label">Total de resultados recuperados</div>
+                <div class="vm-metric-value">@(ViewBag.TotalResultados ?? 0)</div>
+                <p class="vm-metric-help">
+                    Cantidad de registros devueltos como resultados de búsqueda semántica.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="vm-panel">
+        <h5>Relación entre las métricas semánticas</h5>
+
+        <p>
+            La búsqueda semántica se evalúa considerando dos aspectos principales: el tiempo que tarda
+            el sistema en recuperar información y la calidad de los resultados obtenidos. La relevancia
+            y el promedio de similitud permiten comprobar si los registros recuperados tienen relación
+            con la consulta del usuario.
+        </p>
+
+        <div class="d-flex flex-wrap">
+            <span class="vm-pill">Tiempo de consulta semántica</span>
+            <span class="vm-pill">Relevancia de recuperación</span>
+            <span class="vm-pill">Promedio de similitud</span>
+            <span class="vm-pill">Total de búsquedas</span>
+            <span class="vm-pill">Resultados recuperados</span>
+        </div>
+    </div>
+
+    <div class="vm-panel">
+        <h5>Flujo de una búsqueda semántica</h5>
+
+        <div class="vm-flow">
+
+            <div class="vm-flow-step">
+                <div class="vm-flow-number">1</div>
+                <div class="vm-flow-title">Consulta</div>
+                <p class="vm-flow-text">
+                    El usuario escribe una frase o pregunta relacionada con sus registros.
+                </p>
+            </div>
+
+            <div class="vm-flow-step">
+                <div class="vm-flow-number">2</div>
+                <div class="vm-flow-title">Embedding</div>
+                <p class="vm-flow-text">
+                    La consulta se convierte en un vector para poder compararla semánticamente.
+                </p>
+            </div>
+
+            <div class="vm-flow-step">
+                <div class="vm-flow-number">3</div>
+                <div class="vm-flow-title">Comparación</div>
+                <p class="vm-flow-text">
+                    El vector de la consulta se compara con los vectores almacenados en la base.
+                </p>
+            </div>
+
+            <div class="vm-flow-step">
+                <div class="vm-flow-number">4</div>
+                <div class="vm-flow-title">Recuperación</div>
+                <p class="vm-flow-text">
+                    Se seleccionan los registros con mayor nivel de similitud semántica.
+                </p>
+            </div>
+
+            <div class="vm-flow-step">
+                <div class="vm-flow-number">5</div>
+                <div class="vm-flow-title">Métricas</div>
+                <p class="vm-flow-text">
+                    Se guardan tiempo de búsqueda, relevancia, similitud y resultados.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="vm-panel">
+        <h5>Interpretación técnica</h5>
+
+        <div class="vm-info-grid">
+
+            <div class="vm-info-box">
+                <div class="vm-info-title">Tiempo de consulta</div>
+                <p class="vm-info-text">
+                    Un valor bajo indica que la recuperación de información es rápida. Si aumenta,
+                    puede deberse a mayor cantidad de registros o consultas más pesadas.
+                </p>
+            </div>
+
+            <div class="vm-info-box">
+                <div class="vm-info-title">Relevancia</div>
+                <p class="vm-info-text">
+                    Representa qué tan relacionados están los registros recuperados con la consulta.
+                    Mientras mayor sea, mejores son los resultados.
+                </p>
+            </div>
+
+            <div class="vm-info-box">
+                <div class="vm-info-title">Similitud promedio</div>
+                <p class="vm-info-text">
+                    Permite evaluar la calidad general de los resultados devueltos por la búsqueda vectorial.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="vm-note">
+        <strong>Interpretación:</strong> esta vista demuestra el uso de la base vectorial en VitaMind.
+        No se busca información solo por coincidencia exacta de palabras, sino por similitud de significado
+        entre la consulta del usuario y los registros almacenados.
+    </div>
+
+    <div class="vm-actions">
+        <a asp-controller="Admin" asp-action="MetricasCalidad" class="btn btn-outline-secondary vm-btn">
+            ← Volver a calidad
+        </a>
+
+        <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-primary vm-btn">
+            Dashboard principal
+        </a>
+
+        <a asp-controller="Admin" asp-action="MetricasAgente" class="btn btn-primary vm-btn">
+            Ver agente conversacional →
+        </a>
+
+        <a asp-controller="Auth" asp-action="Logout" class="btn btn-outline-danger vm-btn">
+            Cerrar sesión
+        </a>
+    </div>
+
+</div>

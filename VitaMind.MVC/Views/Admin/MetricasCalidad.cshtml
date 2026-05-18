@@ -1,0 +1,485 @@
+﻿@using Newtonsoft.Json.Linq
+
+@{
+    ViewData["Title"] = "Calidad de Datos - VitaMind";
+
+    var intentosFallidosPorUsuario = ViewBag.IntentosFallidosPorUsuario as JArray;
+}
+
+<style>
+    body {
+        background: #f4f8fb;
+    }
+
+    .vm-admin-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .vm-hero {
+        background: linear-gradient(135deg, #fff0f1 0%, #fff8f8 55%, #ffffff 100%);
+        border: 1px solid #f5d6da;
+        border-radius: 26px;
+        padding: 32px;
+        margin-bottom: 26px;
+        box-shadow: 0 10px 28px rgba(96, 19, 35, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .vm-hero::after {
+            content: "";
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: rgba(220, 53, 69, 0.10);
+            right: -75px;
+            top: -85px;
+        }
+
+    .vm-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #ffffff;
+        color: #dc3545;
+        border: 1px solid #f2cbd0;
+        padding: 8px 14px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 650;
+        margin-bottom: 14px;
+    }
+
+    .vm-hero h1 {
+        color: #12343b;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .vm-hero p {
+        color: #52656b;
+        font-size: 1.03rem;
+        max-width: 850px;
+        margin-bottom: 0;
+    }
+
+    .vm-section-title {
+        color: #173b43;
+        font-weight: 800;
+        margin-bottom: 16px;
+    }
+
+    .vm-metric-card {
+        background: #ffffff;
+        border: 1px solid #e2edf0;
+        border-radius: 22px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(15, 56, 66, 0.07);
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.25s ease;
+    }
+
+        .vm-metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 34px rgba(15, 56, 66, 0.12);
+        }
+
+        .vm-metric-card::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 5px;
+            left: 0;
+            top: 0;
+        }
+
+        .vm-metric-card.danger::before {
+            background: #dc3545;
+        }
+
+        .vm-metric-card.success::before {
+            background: #20c997;
+        }
+
+        .vm-metric-card.warning::before {
+            background: #ffc107;
+        }
+
+    .vm-icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 14px;
+    }
+
+    .vm-icon-red {
+        background: #fff0f1;
+        color: #dc3545;
+    }
+
+    .vm-icon-green {
+        background: #e9f9f4;
+        color: #087f5b;
+    }
+
+    .vm-icon-yellow {
+        background: #fff8db;
+        color: #9a7a00;
+    }
+
+    .vm-metric-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 650;
+        margin-bottom: 8px;
+    }
+
+    .vm-metric-value {
+        color: #12343b;
+        font-size: 2.1rem;
+        font-weight: 850;
+        margin-bottom: 4px;
+    }
+
+    .vm-metric-help {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0;
+    }
+
+    .vm-panel {
+        background: #ffffff;
+        border: 1px solid #e2edf0;
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(15, 56, 66, 0.07);
+        margin-top: 26px;
+    }
+
+        .vm-panel h5 {
+            color: #173b43;
+            font-weight: 800;
+            margin-bottom: 14px;
+        }
+
+        .vm-panel p {
+            color: #52656b;
+        }
+
+    .vm-table {
+        margin-bottom: 0;
+    }
+
+        .vm-table thead th {
+            background: #f8f1f2;
+            color: #173b43;
+            font-weight: 800;
+            border-bottom: 1px solid #efd9dc;
+            padding: 14px;
+        }
+
+        .vm-table tbody td {
+            padding: 14px;
+            color: #455a64;
+            vertical-align: middle;
+        }
+
+        .vm-table tbody tr:hover {
+            background: #fff8f8;
+        }
+
+    .vm-pill-danger {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 42px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: #fff0f1;
+        color: #dc3545;
+        font-weight: 800;
+    }
+
+    .vm-pill-success {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 13px;
+        border-radius: 999px;
+        background: #e9f9f4;
+        color: #087f5b;
+        font-weight: 750;
+        font-size: 0.88rem;
+        margin: 4px;
+    }
+
+    .vm-pill-warning {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 13px;
+        border-radius: 999px;
+        background: #fff8db;
+        color: #9a7a00;
+        font-weight: 750;
+        font-size: 0.88rem;
+        margin: 4px;
+    }
+
+    .vm-quality-box {
+        background: #f8fbfd;
+        border: 1px solid #e2edf0;
+        border-radius: 18px;
+        padding: 18px;
+        height: 100%;
+    }
+
+    .vm-quality-title {
+        color: #173b43;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .vm-quality-text {
+        color: #6c757d;
+        margin-bottom: 0;
+        font-size: 0.92rem;
+    }
+
+    .vm-note {
+        margin-top: 24px;
+        background: #ffffff;
+        border-left: 5px solid #dc3545;
+        border-radius: 14px;
+        padding: 15px;
+        color: #52656b;
+        box-shadow: 0 6px 18px rgba(15, 56, 66, 0.05);
+    }
+
+    .vm-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 28px;
+    }
+
+    .vm-btn {
+        border-radius: 14px;
+        padding: 11px 18px;
+        font-weight: 650;
+    }
+
+    .fade-in {
+        animation: fadeIn 0.45s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<div class="container mt-4 vm-admin-container fade-in">
+
+    <section class="vm-hero">
+        <div class="vm-badge">
+            <span>🛡️</span>
+            <span>Calidad de datos</span>
+        </div>
+
+        <h1>Control de errores, éxito y registros similares</h1>
+
+        <p>
+            Esta sección permite analizar la calidad de la información registrada en VitaMind.
+            Aquí se visualizan errores de ingreso, tasa de éxito, intentos fallidos por usuario
+            y registros similares o posibles duplicados detectados por similitud semántica.
+        </p>
+    </section>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-warning rounded-4">
+            @ViewBag.Error
+        </div>
+    }
+
+    <h4 class="vm-section-title">Indicadores principales de calidad</h4>
+
+    <div class="row g-4">
+
+        <div class="col-lg-4 col-md-6">
+            <div class="vm-metric-card danger">
+                <div class="vm-icon-box vm-icon-red">⚠️</div>
+                <div class="vm-metric-label">Errores de ingreso</div>
+                <div class="vm-metric-value">@(ViewBag.Errores ?? 0)</div>
+                <p class="vm-metric-help">
+                    Cantidad de errores generados por datos incompletos, inválidos o fallos del sistema.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+            <div class="vm-metric-card success">
+                <div class="vm-icon-box vm-icon-green">✅</div>
+                <div class="vm-metric-label">Tasa de éxito de inserción</div>
+                <div class="vm-metric-value">@(ViewBag.TasaExito ?? 0)%</div>
+                <p class="vm-metric-help">
+                    Porcentaje de registros correctos frente al total de intentos realizados.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-12">
+            <div class="vm-metric-card warning">
+                <div class="vm-icon-box vm-icon-yellow">🧩</div>
+                <div class="vm-metric-label">Registros similares</div>
+                <div class="vm-metric-value">@(ViewBag.RegistrosSimilares ?? 0)</div>
+                <p class="vm-metric-help">
+                    Registros detectados como similares o posibles duplicados semánticos.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="vm-panel">
+        <h5>Relación entre las métricas de calidad</h5>
+
+        <p>
+            Los errores de ingreso afectan directamente a la tasa de éxito. Además, los registros similares
+            ayudan a identificar información repetida o muy parecida dentro de la base vectorial.
+        </p>
+
+        <div class="d-flex flex-wrap">
+            <span class="vm-pill-warning">Errores de ingreso</span>
+            <span class="vm-pill-success">Tasa de éxito</span>
+            <span class="vm-pill-warning">Registros similares</span>
+            <span class="vm-pill-warning">Intentos fallidos por usuario</span>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-lg-7">
+            <div class="vm-panel">
+                <h5>Intentos fallidos por usuario</h5>
+
+                <div class="table-responsive">
+                    <table class="table vm-table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th class="text-center">Total de errores</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (intentosFallidosPorUsuario != null && intentosFallidosPorUsuario.Count > 0)
+                            {
+                                foreach (var item in intentosFallidosPorUsuario)
+                                {
+                                    <tr>
+                                        <td>@(item["usuario"]?.ToString() ?? "Usuario no identificado")</td>
+                                        <td class="text-center">
+                                            <span class="vm-pill-danger">
+                                                @(item["totalErrores"]?.ToString() ?? "0")
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="2" class="text-muted">
+                                        No existen errores registrados por usuario.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="vm-panel">
+                <h5>Interpretación para el administrador</h5>
+
+                <div class="row g-3">
+
+                    <div class="col-12">
+                        <div class="vm-quality-box">
+                            <div class="vm-quality-title">Errores altos</div>
+                            <p class="vm-quality-text">
+                                Puede indicar campos incompletos, sesiones inválidas, problemas con n8n
+                                o fallos de conexión con la API.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="vm-quality-box">
+                            <div class="vm-quality-title">Tasa de éxito baja</div>
+                            <p class="vm-quality-text">
+                                Significa que existe una cantidad importante de intentos fallidos frente a
+                                los registros guardados correctamente.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="vm-quality-box">
+                            <div class="vm-quality-title">Registros similares</div>
+                            <p class="vm-quality-text">
+                                Ayuda a detectar información repetida o muy parecida, usando la comparación
+                                semántica de embeddings.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="vm-note">
+        <strong>Interpretación:</strong> esta vista permite demostrar que VitaMind no solo almacena información,
+        sino que también controla la calidad de los datos mediante validaciones, registro de errores y detección
+        de similitud semántica.
+    </div>
+
+    <div class="vm-actions">
+        <a asp-controller="Admin" asp-action="MetricasRendimiento" class="btn btn-outline-secondary vm-btn">
+            ← Volver a rendimiento
+        </a>
+
+        <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-primary vm-btn">
+            Dashboard principal
+        </a>
+
+        <a asp-controller="Admin" asp-action="MetricasSemantica" class="btn btn-primary vm-btn">
+            Ver búsqueda semántica →
+        </a>
+
+        <a asp-controller="Auth" asp-action="Logout" class="btn btn-outline-danger vm-btn">
+            Cerrar sesión
+        </a>
+    </div>
+
+</div>

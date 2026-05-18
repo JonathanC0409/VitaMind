@@ -1,0 +1,442 @@
+﻿@{
+    ViewData["Title"] = "Rendimiento Vectorial - VitaMind";
+}
+
+<style>
+    body {
+        background: #f4f8fb;
+    }
+
+    .vm-admin-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .vm-hero {
+        background: linear-gradient(135deg, #e6f8fb 0%, #eef6ff 55%, #ffffff 100%);
+        border: 1px solid #dcefed;
+        border-radius: 26px;
+        padding: 32px;
+        margin-bottom: 26px;
+        box-shadow: 0 10px 28px rgba(19, 80, 96, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .vm-hero::after {
+            content: "";
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: rgba(13, 202, 240, 0.12);
+            right: -75px;
+            top: -85px;
+        }
+
+    .vm-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #ffffff;
+        color: #0dcaf0;
+        border: 1px solid #cceff5;
+        padding: 8px 14px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 650;
+        margin-bottom: 14px;
+    }
+
+    .vm-hero h1 {
+        color: #12343b;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .vm-hero p {
+        color: #52656b;
+        font-size: 1.03rem;
+        max-width: 850px;
+        margin-bottom: 0;
+    }
+
+    .vm-section-title {
+        color: #173b43;
+        font-weight: 800;
+        margin-bottom: 16px;
+    }
+
+    .vm-metric-card {
+        background: #ffffff;
+        border: 1px solid #e2edf0;
+        border-radius: 22px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(15, 56, 66, 0.07);
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.25s ease;
+    }
+
+        .vm-metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 34px rgba(15, 56, 66, 0.12);
+        }
+
+        .vm-metric-card::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 5px;
+            left: 0;
+            top: 0;
+        }
+
+        .vm-metric-card.info::before {
+            background: #0dcaf0;
+        }
+
+        .vm-metric-card.success::before {
+            background: #20c997;
+        }
+
+        .vm-metric-card.warning::before {
+            background: #ffc107;
+        }
+
+        .vm-metric-card.primary::before {
+            background: #0d6efd;
+        }
+
+    .vm-icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 14px;
+    }
+
+    .vm-icon-cyan {
+        background: #e6f8fb;
+        color: #0dcaf0;
+    }
+
+    .vm-icon-green {
+        background: #e9f9f4;
+        color: #087f5b;
+    }
+
+    .vm-icon-yellow {
+        background: #fff8db;
+        color: #9a7a00;
+    }
+
+    .vm-icon-blue {
+        background: #e7f1ff;
+        color: #0d6efd;
+    }
+
+    .vm-metric-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 650;
+        margin-bottom: 8px;
+    }
+
+    .vm-metric-value {
+        color: #12343b;
+        font-size: 2rem;
+        font-weight: 850;
+        margin-bottom: 4px;
+    }
+
+    .vm-metric-help {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0;
+    }
+
+    .vm-panel {
+        background: #ffffff;
+        border: 1px solid #e2edf0;
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(15, 56, 66, 0.07);
+        margin-top: 26px;
+    }
+
+        .vm-panel h5 {
+            color: #173b43;
+            font-weight: 800;
+            margin-bottom: 14px;
+        }
+
+        .vm-panel p {
+            color: #52656b;
+        }
+
+    .vm-flow {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-top: 18px;
+    }
+
+    .vm-flow-step {
+        background: #f8fbfd;
+        border: 1px solid #e2edf0;
+        border-radius: 18px;
+        padding: 18px;
+        text-align: center;
+        height: 100%;
+    }
+
+    .vm-flow-number {
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+        background: #e6f8fb;
+        color: #0a91a5;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .vm-flow-title {
+        color: #173b43;
+        font-weight: 800;
+        margin-bottom: 6px;
+    }
+
+    .vm-flow-text {
+        color: #6c757d;
+        font-size: 0.88rem;
+        margin-bottom: 0;
+    }
+
+    .vm-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 13px;
+        border-radius: 999px;
+        background: #e6f8fb;
+        color: #0a91a5;
+        font-weight: 750;
+        font-size: 0.88rem;
+        margin: 4px;
+    }
+
+    .vm-note {
+        margin-top: 24px;
+        background: #ffffff;
+        border-left: 5px solid #0dcaf0;
+        border-radius: 14px;
+        padding: 15px;
+        color: #52656b;
+        box-shadow: 0 6px 18px rgba(15, 56, 66, 0.05);
+    }
+
+    .vm-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 28px;
+    }
+
+    .vm-btn {
+        border-radius: 14px;
+        padding: 11px 18px;
+        font-weight: 650;
+    }
+
+    .fade-in {
+        animation: fadeIn 0.45s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@media (max-width: 992px) {
+        .vm-flow {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .vm-flow {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="container mt-4 vm-admin-container fade-in">
+
+    <section class="vm-hero">
+        <div class="vm-badge">
+            <span>⚙️</span>
+            <span>Rendimiento vectorial</span>
+        </div>
+
+        <h1>Rendimiento de inserción y embeddings</h1>
+
+        <p>
+            Esta sección muestra el comportamiento técnico del sistema al registrar información,
+            generar embeddings y almacenarlos como vectores. Permite explicar cuánto tarda VitaMind
+            en procesar un registro desde que el cliente lo envía hasta que queda almacenado.
+        </p>
+    </section>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-warning rounded-4">
+            @ViewBag.Error
+        </div>
+    }
+
+    <h4 class="vm-section-title">Métricas principales de rendimiento</h4>
+
+    <div class="row g-4">
+
+        <div class="col-lg-3 col-md-6">
+            <div class="vm-metric-card info">
+                <div class="vm-icon-box vm-icon-cyan">⏱️</div>
+                <div class="vm-metric-label">Latencia promedio</div>
+                <div class="vm-metric-value">@(ViewBag.LatenciaPromedio ?? 0)</div>
+                <p class="vm-metric-help">
+                    Tiempo promedio de inserción del registro en milisegundos.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="vm-metric-card success">
+                <div class="vm-icon-box vm-icon-green">⚙️</div>
+                <div class="vm-metric-label">Tiempo generación embedding</div>
+                <div class="vm-metric-value">@(ViewBag.TiempoPromedioEmbedding ?? 0)</div>
+                <p class="vm-metric-help">
+                    Tiempo promedio para transformar texto en vector.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="vm-metric-card warning">
+                <div class="vm-icon-box vm-icon-yellow">🧠</div>
+                <div class="vm-metric-label">Vectores almacenados</div>
+                <div class="vm-metric-value">@(ViewBag.Vectores ?? 0)</div>
+                <p class="vm-metric-help">
+                    Cantidad de registros que tienen embedding asociado.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="vm-metric-card primary">
+                <div class="vm-icon-box vm-icon-blue">📐</div>
+                <div class="vm-metric-label">Dimensión embedding</div>
+                <div class="vm-metric-value">@(ViewBag.DimensionEmbedding ?? 0)</div>
+                <p class="vm-metric-help">
+                    Tamaño del vector usado para representar los registros.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="vm-panel">
+        <h5>Relación entre las métricas</h5>
+
+        <p>
+            La latencia de inserción se relaciona directamente con el tiempo de generación del embedding,
+            porque antes de guardar un registro el sistema debe convertir la descripción textual en una
+            representación vectorial. Luego ese vector se almacena en Supabase PostgreSQL con pgVector.
+        </p>
+
+        <div class="d-flex flex-wrap">
+            <span class="vm-pill">Latencia de inserción</span>
+            <span class="vm-pill">Tiempo generación embedding</span>
+            <span class="vm-pill">Vectores almacenados</span>
+            <span class="vm-pill">Dimensión del embedding</span>
+        </div>
+    </div>
+
+    <div class="vm-panel">
+        <h5>Flujo técnico del registro vectorial</h5>
+
+        <div class="vm-flow">
+
+            <div class="vm-flow-step">
+                <div class="vm-flow-number">1</div>
+                <div class="vm-flow-title">Entrada del usuario</div>
+                <p class="vm-flow-text">
+                    El cliente registra una categoría, descripción, intensidad y observación.
+                </p>
+            </div>
+
+            <div class="vm-flow-step">
+                <div class="vm-flow-number">2</div>
+                <div class="vm-flow-title">Generación embedding</div>
+                <p class="vm-flow-text">
+                    El sistema convierte el texto en un vector numérico de dimensión definida.
+                </p>
+            </div>
+
+            <div class="vm-flow-step">
+                <div class="vm-flow-number">3</div>
+                <div class="vm-flow-title">Almacenamiento</div>
+                <p class="vm-flow-text">
+                    El registro y su vector se guardan en Supabase PostgreSQL con pgVector.
+                </p>
+            </div>
+
+            <div class="vm-flow-step">
+                <div class="vm-flow-number">4</div>
+                <div class="vm-flow-title">Métrica calculada</div>
+                <p class="vm-flow-text">
+                    Se actualizan latencia, tiempo de embedding y cantidad de vectores.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="vm-note">
+        <strong>Interpretación:</strong> si la latencia aumenta, puede deberse al tiempo de generación del embedding,
+        a la conexión con la base de datos o al proceso de almacenamiento. Esta vista permite explicar el rendimiento
+        técnico de la base vectorial.
+    </div>
+
+    <div class="vm-actions">
+        <a asp-controller="Admin" asp-action="MetricasRegistros" class="btn btn-outline-secondary vm-btn">
+            ← Volver a registros
+        </a>
+
+        <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-primary vm-btn">
+            Dashboard principal
+        </a>
+
+        <a asp-controller="Admin" asp-action="MetricasCalidad" class="btn btn-primary vm-btn">
+            Ver calidad de datos →
+        </a>
+
+        <a asp-controller="Auth" asp-action="Logout" class="btn btn-outline-danger vm-btn">
+            Cerrar sesión
+        </a>
+    </div>
+
+</div>

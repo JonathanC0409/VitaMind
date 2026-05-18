@@ -91,7 +91,7 @@ namespace VitaMind.MVC.Controllers
             {
                 var client = _httpClientFactory.CreateClient();
 
-                var url = "http://localhost:5678/webhook-test/vitamind-chatbot";
+                var url = "https://jonathanc040903.app.n8n.cloud/webhook/vitamind-chatbot";
 
                 var datos = new
                 {

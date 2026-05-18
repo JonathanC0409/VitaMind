@@ -1,0 +1,416 @@
+﻿@using Newtonsoft.Json.Linq
+
+@{
+    ViewData["Title"] = "Métricas de Registros - VitaMind";
+
+    var registrosPorUsuario = ViewBag.RegistrosPorUsuario as JArray;
+    var registrosPorFecha = ViewBag.RegistrosPorFecha as JArray;
+}
+
+<style>
+    body {
+        background: #f4f8fb;
+    }
+
+    .vm-admin-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .vm-hero {
+        background: linear-gradient(135deg, #e7f1ff 0%, #eef6ff 55%, #ffffff 100%);
+        border: 1px solid #dcefed;
+        border-radius: 26px;
+        padding: 32px;
+        margin-bottom: 26px;
+        box-shadow: 0 10px 28px rgba(19, 80, 96, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .vm-hero::after {
+            content: "";
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: rgba(13, 110, 253, 0.10);
+            right: -75px;
+            top: -85px;
+        }
+
+    .vm-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #ffffff;
+        color: #0d6efd;
+        border: 1px solid #d4e6ff;
+        padding: 8px 14px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 650;
+        margin-bottom: 14px;
+    }
+
+    .vm-hero h1 {
+        color: #12343b;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .vm-hero p {
+        color: #52656b;
+        font-size: 1.03rem;
+        max-width: 820px;
+        margin-bottom: 0;
+    }
+
+    .vm-section-title {
+        color: #173b43;
+        font-weight: 800;
+        margin-bottom: 16px;
+    }
+
+    .vm-metric-card {
+        background: #ffffff;
+        border: 1px solid #e2edf0;
+        border-radius: 22px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(15, 56, 66, 0.07);
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.25s ease;
+    }
+
+        .vm-metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 34px rgba(15, 56, 66, 0.12);
+        }
+
+        .vm-metric-card::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 5px;
+            left: 0;
+            top: 0;
+            background: #0d6efd;
+        }
+
+    .vm-icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        background: #e7f1ff;
+        color: #0d6efd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 14px;
+    }
+
+    .vm-metric-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 650;
+        margin-bottom: 8px;
+    }
+
+    .vm-metric-value {
+        color: #12343b;
+        font-size: 2.2rem;
+        font-weight: 850;
+        margin-bottom: 4px;
+    }
+
+    .vm-metric-help {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0;
+    }
+
+    .vm-panel {
+        background: #ffffff;
+        border: 1px solid #e2edf0;
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(15, 56, 66, 0.07);
+        margin-top: 26px;
+    }
+
+        .vm-panel h5 {
+            color: #173b43;
+            font-weight: 800;
+            margin-bottom: 14px;
+        }
+
+    .vm-table {
+        margin-bottom: 0;
+    }
+
+        .vm-table thead th {
+            background: #f1f7fb;
+            color: #173b43;
+            font-weight: 800;
+            border-bottom: 1px solid #dcefed;
+            padding: 14px;
+        }
+
+        .vm-table tbody td {
+            padding: 14px;
+            color: #455a64;
+            vertical-align: middle;
+        }
+
+        .vm-table tbody tr:hover {
+            background: #f8fbfd;
+        }
+
+    .vm-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: #e7f1ff;
+        color: #0d6efd;
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+
+    .vm-total-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 42px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: #e9f9f4;
+        color: #087f5b;
+        font-weight: 800;
+    }
+
+    .vm-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 28px;
+    }
+
+    .vm-btn {
+        border-radius: 14px;
+        padding: 11px 18px;
+        font-weight: 650;
+    }
+
+    .vm-note {
+        margin-top: 24px;
+        background: #ffffff;
+        border-left: 5px solid #0d6efd;
+        border-radius: 14px;
+        padding: 15px;
+        color: #52656b;
+        box-shadow: 0 6px 18px rgba(15, 56, 66, 0.05);
+    }
+
+    .fade-in {
+        animation: fadeIn 0.45s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<div class="container mt-4 vm-admin-container fade-in">
+
+    <section class="vm-hero">
+        <div class="vm-badge">
+            <span>📁</span>
+            <span>Métricas de registros</span>
+        </div>
+
+        <h1>Actividad de registros del sistema</h1>
+
+        <p>
+            Esta sección muestra la cantidad total de registros almacenados, su distribución por usuario
+            y la evolución de registros por fecha. Estas métricas permiten analizar la participación de los clientes
+            y el crecimiento de la información almacenada en VitaMind.
+        </p>
+    </section>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-warning rounded-4">
+            @ViewBag.Error
+        </div>
+    }
+
+    <div class="row g-4">
+
+        <div class="col-lg-4 col-md-6">
+            <div class="vm-metric-card">
+                <div class="vm-icon-box">📋</div>
+                <div class="vm-metric-label">Total de registros ingresados</div>
+                <div class="vm-metric-value">@(ViewBag.TotalRegistros ?? 0)</div>
+                <p class="vm-metric-help">
+                    Cantidad total de registros almacenados en la base de datos vectorial.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-8 col-md-6">
+            <div class="vm-panel mt-0 h-100">
+                <h5>Relación con métricas adicionales</h5>
+
+                <p class="text-muted mb-3">
+                    El total de registros se complementa con dos métricas adicionales importantes:
+                </p>
+
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="vm-pill">Registros por usuario</span>
+                    <span class="vm-pill">Registros por fecha</span>
+                </div>
+
+                <p class="text-muted mt-3 mb-0">
+                    Esto permite saber no solo cuántos registros existen, sino también quién los ingresó
+                    y en qué fechas se generó mayor actividad.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-lg-6">
+            <div class="vm-panel">
+                <h5>Registros por usuario</h5>
+
+                <div class="table-responsive">
+                    <table class="table vm-table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Rol</th>
+                                <th class="text-center">Total registros</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (registrosPorUsuario != null && registrosPorUsuario.Count > 0)
+                            {
+                                foreach (var item in registrosPorUsuario)
+                                {
+                                    <tr>
+                                        <td>@(item["usuario"]?.ToString() ?? "Sin nombre")</td>
+                                        <td>
+                                            <span class="vm-pill">
+                                                @(item["rol"]?.ToString() ?? "Sin rol")
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="vm-total-pill">
+                                                @(item["totalRegistros"]?.ToString() ?? "0")
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="3" class="text-muted">
+                                        No existen registros por usuario.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="vm-panel">
+                <h5>Registros por fecha</h5>
+
+                <div class="table-responsive">
+                    <table class="table vm-table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th class="text-center">Total registros</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (registrosPorFecha != null && registrosPorFecha.Count > 0)
+                            {
+                                foreach (var item in registrosPorFecha)
+                                {
+                                    var fechaTexto = item["fecha"]?.ToString();
+                                    var fechaFormateada = fechaTexto;
+
+                                    if (DateTime.TryParse(fechaTexto, out DateTime fecha))
+                                    {
+                                        fechaFormateada = fecha.ToString("dd/MM/yyyy");
+                                    }
+
+                                    <tr>
+                                        <td>@fechaFormateada</td>
+                                        <td class="text-center">
+                                            <span class="vm-total-pill">
+                                                @(item["totalRegistros"]?.ToString() ?? "0")
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="2" class="text-muted">
+                                        No existen registros por fecha.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="vm-note">
+        <strong>Interpretación:</strong> si un usuario concentra muchos registros, significa que está usando más
+        activamente el sistema. La métrica por fecha permite observar la evolución del ingreso de información
+        y detectar días con mayor actividad.
+    </div>
+
+    <div class="vm-actions">
+        <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-secondary vm-btn">
+            ← Volver al dashboard
+        </a>
+
+        <a asp-controller="Admin" asp-action="MetricasRendimiento" class="btn btn-primary vm-btn">
+            Ver rendimiento vectorial →
+        </a>
+
+        <a asp-controller="Auth" asp-action="Logout" class="btn btn-outline-danger vm-btn">
+            Cerrar sesión
+        </a>
+    </div>
+
+</div>

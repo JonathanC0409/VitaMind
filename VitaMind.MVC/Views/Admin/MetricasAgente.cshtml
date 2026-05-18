@@ -1,0 +1,641 @@
+﻿@using Newtonsoft.Json.Linq
+
+@{
+    ViewData["Title"] = "Agente Conversacional - VitaMind";
+
+    var consultasPorTipoUsuario = ViewBag.ConsultasPorTipoUsuario as JArray;
+    var topTerminosConsultados = ViewBag.TopTerminosConsultados as JArray;
+}
+
+<style>
+    body {
+        background: #f4f8fb;
+    }
+
+    .vm-admin-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .vm-hero {
+        background: linear-gradient(135deg, #e9f9f4 0%, #eef6ff 55%, #ffffff 100%);
+        border: 1px solid #dcefed;
+        border-radius: 26px;
+        padding: 32px;
+        margin-bottom: 26px;
+        box-shadow: 0 10px 28px rgba(19, 80, 96, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .vm-hero::after {
+            content: "";
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: rgba(32, 201, 151, 0.12);
+            right: -75px;
+            top: -85px;
+        }
+
+    .vm-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #ffffff;
+        color: #087f5b;
+        border: 1px solid #c9f1e4;
+        padding: 8px 14px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 650;
+        margin-bottom: 14px;
+    }
+
+    .vm-hero h1 {
+        color: #12343b;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .vm-hero p {
+        color: #52656b;
+        font-size: 1.03rem;
+        max-width: 860px;
+        margin-bottom: 0;
+    }
+
+    .vm-section-title {
+        color: #173b43;
+        font-weight: 800;
+        margin-bottom: 16px;
+    }
+
+    .vm-metric-card {
+        background: #ffffff;
+        border: 1px solid #e2edf0;
+        border-radius: 22px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(15, 56, 66, 0.07);
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.25s ease;
+    }
+
+        .vm-metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 34px rgba(15, 56, 66, 0.12);
+        }
+
+        .vm-metric-card::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 5px;
+            left: 0;
+            top: 0;
+        }
+
+        .vm-metric-card.success::before {
+            background: #20c997;
+        }
+
+        .vm-metric-card.purple::before {
+            background: #6f42c1;
+        }
+
+        .vm-metric-card.info::before {
+            background: #0dcaf0;
+        }
+
+    .vm-icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 14px;
+    }
+
+    .vm-icon-green {
+        background: #e9f9f4;
+        color: #087f5b;
+    }
+
+    .vm-icon-purple {
+        background: #f3ecff;
+        color: #6f42c1;
+    }
+
+    .vm-icon-cyan {
+        background: #e6f8fb;
+        color: #0dcaf0;
+    }
+
+    .vm-metric-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 650;
+        margin-bottom: 8px;
+    }
+
+    .vm-metric-value {
+        color: #12343b;
+        font-size: 2.2rem;
+        font-weight: 850;
+        margin-bottom: 4px;
+    }
+
+    .vm-metric-help {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0;
+    }
+
+    .vm-panel {
+        background: #ffffff;
+        border: 1px solid #e2edf0;
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(15, 56, 66, 0.07);
+        margin-top: 26px;
+    }
+
+        .vm-panel h5 {
+            color: #173b43;
+            font-weight: 800;
+            margin-bottom: 14px;
+        }
+
+        .vm-panel p {
+            color: #52656b;
+        }
+
+    .vm-table {
+        margin-bottom: 0;
+    }
+
+        .vm-table thead th {
+            background: #f1fbf7;
+            color: #173b43;
+            font-weight: 800;
+            border-bottom: 1px solid #d7efe6;
+            padding: 14px;
+        }
+
+        .vm-table tbody td {
+            padding: 14px;
+            color: #455a64;
+            vertical-align: middle;
+        }
+
+        .vm-table tbody tr:hover {
+            background: #f8fdfb;
+        }
+
+    .vm-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 13px;
+        border-radius: 999px;
+        background: #e9f9f4;
+        color: #087f5b;
+        font-weight: 750;
+        font-size: 0.88rem;
+        margin: 4px;
+    }
+
+    .vm-pill-purple {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 13px;
+        border-radius: 999px;
+        background: #f3ecff;
+        color: #6f42c1;
+        font-weight: 750;
+        font-size: 0.88rem;
+        margin: 4px;
+    }
+
+    .vm-total-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 42px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: #e9f9f4;
+        color: #087f5b;
+        font-weight: 800;
+    }
+
+    .vm-term-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 13px;
+        border-radius: 999px;
+        background: #f3ecff;
+        color: #6f42c1;
+        font-weight: 800;
+        font-size: 0.9rem;
+    }
+
+    .vm-flow {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-top: 18px;
+    }
+
+    .vm-flow-step {
+        background: #f8fbfd;
+        border: 1px solid #e2edf0;
+        border-radius: 18px;
+        padding: 18px;
+        text-align: center;
+        height: 100%;
+    }
+
+    .vm-flow-number {
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+        background: #e9f9f4;
+        color: #087f5b;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .vm-flow-title {
+        color: #173b43;
+        font-weight: 800;
+        margin-bottom: 6px;
+    }
+
+    .vm-flow-text {
+        color: #6c757d;
+        font-size: 0.88rem;
+        margin-bottom: 0;
+    }
+
+    .vm-info-box {
+        background: #f8fbfd;
+        border: 1px solid #e2edf0;
+        border-radius: 18px;
+        padding: 18px;
+        height: 100%;
+    }
+
+    .vm-info-title {
+        color: #173b43;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .vm-info-text {
+        color: #6c757d;
+        margin-bottom: 0;
+        font-size: 0.92rem;
+    }
+
+    .vm-note {
+        margin-top: 24px;
+        background: #ffffff;
+        border-left: 5px solid #20c997;
+        border-radius: 14px;
+        padding: 15px;
+        color: #52656b;
+        box-shadow: 0 6px 18px rgba(15, 56, 66, 0.05);
+    }
+
+    .vm-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 28px;
+    }
+
+    .vm-btn {
+        border-radius: 14px;
+        padding: 11px 18px;
+        font-weight: 650;
+    }
+
+    .fade-in {
+        animation: fadeIn 0.45s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@media (max-width: 992px) {
+        .vm-flow {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .vm-flow {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="container mt-4 vm-admin-container fade-in">
+
+    <section class="vm-hero">
+        <div class="vm-badge">
+            <span>🤖</span>
+            <span>Agente conversacional</span>
+        </div>
+
+        <h1>Análisis de uso del agente VitaMind</h1>
+
+        <p>
+            Esta sección muestra cómo los usuarios interactúan con el agente conversacional.
+            Permite analizar la cantidad de consultas realizadas, qué tipo de usuarios lo utilizan
+            y cuáles son los términos o temas más frecuentes en las preguntas.
+        </p>
+    </section>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-warning rounded-4">
+            @ViewBag.Error
+        </div>
+    }
+
+    <h4 class="vm-section-title">Métricas principales del agente</h4>
+
+    <div class="row g-4">
+
+        <div class="col-lg-4 col-md-6">
+            <div class="vm-metric-card success">
+                <div class="vm-icon-box vm-icon-green">🤖</div>
+                <div class="vm-metric-label">Total de consultas al agente</div>
+                <div class="vm-metric-value">@(ViewBag.TotalConsultas ?? 0)</div>
+                <p class="vm-metric-help">
+                    Cantidad de preguntas o solicitudes realizadas al agente conversacional.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+            <div class="vm-metric-card purple">
+                <div class="vm-icon-box vm-icon-purple">👥</div>
+                <div class="vm-metric-label">Tipos de usuario detectados</div>
+                <div class="vm-metric-value">@(consultasPorTipoUsuario?.Count ?? 0)</div>
+                <p class="vm-metric-help">
+                    Roles que han interactuado con el agente conversacional.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-12">
+            <div class="vm-metric-card info">
+                <div class="vm-icon-box vm-icon-cyan">🔤</div>
+                <div class="vm-metric-label">Términos principales</div>
+                <div class="vm-metric-value">@(topTerminosConsultados?.Count ?? 0)</div>
+                <p class="vm-metric-help">
+                    Palabras frecuentes identificadas en las consultas al agente.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="vm-panel">
+        <h5>Relación entre métricas del agente</h5>
+
+        <p>
+            El total de consultas indica el uso general del agente. Las consultas por tipo de usuario
+            permiten identificar qué rol lo utiliza más, mientras que el top de términos consultados
+            permite conocer los temas más frecuentes que preguntan los usuarios.
+        </p>
+
+        <div class="d-flex flex-wrap">
+            <span class="vm-pill">Número de consultas al agente</span>
+            <span class="vm-pill-purple">Consultas por tipo de usuario</span>
+            <span class="vm-pill-purple">Top 5 términos consultados</span>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-lg-6">
+            <div class="vm-panel">
+                <h5>Consultas por tipo de usuario</h5>
+
+                <div class="table-responsive">
+                    <table class="table vm-table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Tipo de usuario</th>
+                                <th class="text-center">Total consultas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (consultasPorTipoUsuario != null && consultasPorTipoUsuario.Count > 0)
+                            {
+                                foreach (var item in consultasPorTipoUsuario)
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="vm-pill">
+                                                @(item["tipoUsuario"]?.ToString() ?? "Sin rol")
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="vm-total-pill">
+                                                @(item["totalConsultas"]?.ToString() ?? "0")
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="2" class="text-muted">
+                                        No existen consultas clasificadas por tipo de usuario.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="vm-panel">
+                <h5>Top 5 términos consultados</h5>
+
+                <div class="table-responsive">
+                    <table class="table vm-table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Término</th>
+                                <th class="text-center">Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (topTerminosConsultados != null && topTerminosConsultados.Count > 0)
+                            {
+                                foreach (var item in topTerminosConsultados)
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="vm-term-pill">
+                                                @(item["termino"]?.ToString() ?? "Sin término")
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="vm-total-pill">
+                                                @(item["cantidad"]?.ToString() ?? "0")
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="2" class="text-muted">
+                                        No existen términos consultados.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="vm-panel">
+        <h5>Flujo de interacción con el agente</h5>
+
+        <div class="vm-flow">
+
+            <div class="vm-flow-step">
+                <div class="vm-flow-number">1</div>
+                <div class="vm-flow-title">Pregunta</div>
+                <p class="vm-flow-text">
+                    El usuario escribe una pregunta en la interfaz del chatbot.
+                </p>
+            </div>
+
+            <div class="vm-flow-step">
+                <div class="vm-flow-number">2</div>
+                <div class="vm-flow-title">n8n</div>
+                <p class="vm-flow-text">
+                    La solicitud se envía al flujo de automatización del agente conversacional.
+                </p>
+            </div>
+
+            <div class="vm-flow-step">
+                <div class="vm-flow-number">3</div>
+                <div class="vm-flow-title">Procesamiento</div>
+                <p class="vm-flow-text">
+                    El agente consulta información disponible y genera una respuesta para el usuario.
+                </p>
+            </div>
+
+            <div class="vm-flow-step">
+                <div class="vm-flow-number">4</div>
+                <div class="vm-flow-title">Registro</div>
+                <p class="vm-flow-text">
+                    La consulta se almacena en ConsultaAgentes para alimentar el dashboard.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="vm-panel">
+        <h5>Interpretación administrativa</h5>
+
+        <div class="row g-3">
+
+            <div class="col-lg-4">
+                <div class="vm-info-box">
+                    <div class="vm-info-title">Uso del agente</div>
+                    <p class="vm-info-text">
+                        Un número alto de consultas indica que el agente está siendo utilizado como apoyo
+                        para revisar información registrada.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="vm-info-box">
+                    <div class="vm-info-title">Consultas por rol</div>
+                    <p class="vm-info-text">
+                        Permite comparar si el agente es usado principalmente por clientes,
+                        administradores u otros tipos de usuario.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="vm-info-box">
+                    <div class="vm-info-title">Temas frecuentes</div>
+                    <p class="vm-info-text">
+                        El top de términos ayuda a conocer qué temas o palabras aparecen con mayor frecuencia
+                        en las preguntas realizadas al chatbot.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="vm-note">
+        <strong>Interpretación:</strong> esta vista evidencia la actividad del agente conversacional.
+        Incluso si n8n no está disponible, el sistema registra los intentos de consulta para que el dashboard
+        refleje el uso real y los errores asociados.
+    </div>
+
+    <div class="vm-actions">
+        <a asp-controller="Admin" asp-action="MetricasSemantica" class="btn btn-outline-secondary vm-btn">
+            ← Volver a búsqueda semántica
+        </a>
+
+        <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-primary vm-btn">
+            Dashboard principal
+        </a>
+
+        <a asp-controller="Admin" asp-action="MetricasServicios" class="btn btn-primary vm-btn">
+            Ver estado de servicios →
+        </a>
+
+        <a asp-controller="Chatbot" asp-action="Index" class="btn btn-outline-success vm-btn">
+            Probar agente
+        </a>
+
+        <a asp-controller="Auth" asp-action="Logout" class="btn btn-outline-danger vm-btn">
+            Cerrar sesión
+        </a>
+    </div>
+
+</div>
