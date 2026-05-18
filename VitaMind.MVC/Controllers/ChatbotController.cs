@@ -1,5 +1,6 @@
 ﻿using ConsumeCRUD;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 using System.Net.Http.Json;
 using VitaMind.Models;
 using VitaMind.MVC.Models;
@@ -31,6 +32,8 @@ namespace VitaMind.MVC.Controllers
         [HttpPost]
         public async Task<IActionResult> Preguntar(string pregunta)
         {
+            var reloj = Stopwatch.StartNew();
+
             Guid? idUsuario = null;
 
             var rol = HttpContext.Session.GetString("Rol");
@@ -59,12 +62,25 @@ namespace VitaMind.MVC.Controllers
 
             if (string.IsNullOrWhiteSpace(pregunta))
             {
+                reloj.Stop();
+
                 RegistrarError(
                     idUsuario,
                     "Pregunta",
                     "Campo obligatorio",
                     "La pregunta del agente no puede estar vacía.",
                     "Pregunta vacía"
+                );
+
+                GuardarConsultaAgente(
+                    idUsuario.Value,
+                    pregunta ?? "",
+                    "Debe ingresar una pregunta.",
+                    "Validación",
+                    "Fallida",
+                    (int)reloj.ElapsedMilliseconds,
+                    0,
+                    0
                 );
 
                 ViewBag.Respuesta = "Debe ingresar una pregunta.";
@@ -87,6 +103,8 @@ namespace VitaMind.MVC.Controllers
 
                 if (!response.IsSuccessStatusCode)
                 {
+                    reloj.Stop();
+
                     var error = await response.Content.ReadAsStringAsync();
 
                     RegistrarError(
@@ -97,6 +115,17 @@ namespace VitaMind.MVC.Controllers
                         error
                     );
 
+                    GuardarConsultaAgente(
+                        idUsuario.Value,
+                        pregunta,
+                        "Error al consultar el agente: " + error,
+                        "Consulta al agente",
+                        "Fallida",
+                        (int)reloj.ElapsedMilliseconds,
+                        0,
+                        0
+                    );
+
                     ViewBag.Pregunta = pregunta;
                     ViewBag.Respuesta = "Error al consultar el agente: " + error;
 
@@ -105,16 +134,36 @@ namespace VitaMind.MVC.Controllers
 
                 var respuestaAgente = await response.Content.ReadFromJsonAsync<RespuestaAgenteViewModel>();
 
+                reloj.Stop();
+
+                var respuestaTexto = respuestaAgente?.Respuesta ?? "No se recibió respuesta del agente.";
+                var tiempoConsulta = respuestaAgente?.TiempoConsultaMs ?? (int)reloj.ElapsedMilliseconds;
+                var registrosRecuperados = respuestaAgente?.RegistrosRecuperados ?? 0;
+                var similitudPromedio = respuestaAgente?.SimilitudPromedio ?? 0;
+
+                GuardarConsultaAgente(
+                    idUsuario.Value,
+                    pregunta,
+                    respuestaTexto,
+                    "Consulta al agente",
+                    "Exitosa",
+                    tiempoConsulta,
+                    registrosRecuperados,
+                    similitudPromedio
+                );
+
                 ViewBag.Pregunta = pregunta;
-                ViewBag.Respuesta = respuestaAgente?.Respuesta ?? "No se recibió respuesta del agente.";
-                ViewBag.TiempoConsultaMs = respuestaAgente?.TiempoConsultaMs ?? 0;
-                ViewBag.RegistrosRecuperados = respuestaAgente?.RegistrosRecuperados ?? 0;
-                ViewBag.SimilitudPromedio = respuestaAgente?.SimilitudPromedio ?? 0;
+                ViewBag.Respuesta = respuestaTexto;
+                ViewBag.TiempoConsultaMs = tiempoConsulta;
+                ViewBag.RegistrosRecuperados = registrosRecuperados;
+                ViewBag.SimilitudPromedio = similitudPromedio;
 
                 return View("Index");
             }
             catch (Exception ex)
             {
+                reloj.Stop();
+
                 RegistrarError(
                     idUsuario,
                     "Chatbot",
@@ -123,10 +172,58 @@ namespace VitaMind.MVC.Controllers
                     "Pregunta: " + pregunta
                 );
 
+                if (idUsuario.HasValue)
+                {
+                    GuardarConsultaAgente(
+                        idUsuario.Value,
+                        pregunta,
+                        "Error al conectar con n8n: " + ex.Message,
+                        "Consulta al agente",
+                        "Fallida",
+                        (int)reloj.ElapsedMilliseconds,
+                        0,
+                        0
+                    );
+                }
+
                 ViewBag.Pregunta = pregunta;
                 ViewBag.Respuesta = "Error al conectar con n8n: " + ex.Message;
 
                 return View("Index");
+            }
+        }
+
+        private void GuardarConsultaAgente(
+            Guid idUsuario,
+            string pregunta,
+            string respuesta,
+            string accionDetectada,
+            string estado,
+            int tiempoConsultaMs,
+            int registrosRecuperados,
+            decimal similitudPromedio)
+        {
+            try
+            {
+                var consulta = new ConsultaAgente
+                {
+                    IdConsulta = Guid.NewGuid(),
+                    IdUsuario = idUsuario,
+                    Pregunta = pregunta,
+                    Respuesta = respuesta,
+                    AccionDetectada = accionDetectada,
+                    Estado = estado,
+                    TiempoConsultaMs = tiempoConsultaMs,
+                    RegistrosRecuperados = registrosRecuperados,
+                    SimilitudPromedio = similitudPromedio,
+                    FechaHora = DateTime.UtcNow
+                };
+
+                CRUD<ConsultaAgente>.Create(consulta);
+            }
+            catch
+            {
+                // Evita que un error al guardar la consulta rompa la pantalla del chatbot.
             }
         }
 

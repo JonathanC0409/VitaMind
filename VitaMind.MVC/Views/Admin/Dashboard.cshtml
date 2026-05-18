@@ -1,5 +1,55 @@
-﻿@{
+﻿@using System.Collections
+
+@{
     ViewData["Title"] = "Dashboard Administrador - VitaMind";
+}
+
+@functions {
+    public object? GetProp(object item, string propName)
+    {
+        if (item == null) return null;
+
+        var prop = item.GetType().GetProperty(propName);
+
+        if (prop == null) return null;
+
+        return prop.GetValue(item);
+    }
+
+    public string GetText(object item, string propName)
+    {
+        var value = GetProp(item, propName);
+        return value?.ToString() ?? "";
+    }
+
+    public string GetDateText(object item, string propName)
+    {
+        var value = GetProp(item, propName);
+
+        if (value is DateTime fecha)
+        {
+            return fecha.ToString("dd/MM/yyyy HH:mm");
+        }
+
+        return value?.ToString() ?? "";
+    }
+
+    public int CountItems(object? value)
+    {
+        if (value is IEnumerable lista)
+        {
+            int total = 0;
+
+            foreach (var item in lista)
+            {
+                total++;
+            }
+
+            return total;
+        }
+
+        return 0;
+    }
 }
 
 <style>
@@ -276,6 +326,13 @@
         </p>
     </section>
 
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-warning">
+            @ViewBag.Error
+        </div>
+    }
+
     <h4 class="vm-section-title">Resumen general del sistema</h4>
 
     <div class="row g-4">
@@ -343,9 +400,324 @@
         <div class="col-lg-4 col-md-12">
             <div class="vm-metric-card warning">
                 <div class="vm-icon-box vm-icon-yellow">🧠</div>
-                <div class="vm-metric-label">Vectores almacenados</div>
+                <div class="vm-metric-label">Uso vectorial</div>
                 <div class="vm-metric-value">@(ViewBag.Vectores ?? 0)</div>
-                <p class="vm-metric-help">Embeddings usados para búsqueda semántica.</p>
+                <p class="vm-metric-help">
+                    Vectores almacenados. Dimensión embedding: @(ViewBag.DimensionEmbedding ?? 0).
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row g-4 mt-2">
+
+        <div class="col-lg-4 col-md-6">
+            <div class="vm-metric-card info">
+                <div class="vm-icon-box vm-icon-cyan">🔎</div>
+                <div class="vm-metric-label">Tiempo consulta semántica</div>
+                <div class="vm-metric-value">@(ViewBag.TiempoConsulta ?? 0)</div>
+                <p class="vm-metric-help">Tiempo promedio de búsqueda vectorial en ms.</p>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+            <div class="vm-metric-card purple">
+                <div class="vm-icon-box vm-icon-purple">📈</div>
+                <div class="vm-metric-label">Relevancia promedio</div>
+                <div class="vm-metric-value">@(ViewBag.Relevancia ?? 0)</div>
+                <p class="vm-metric-help">Promedio de similitud en búsquedas semánticas.</p>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-12">
+            <div class="vm-metric-card warning">
+                <div class="vm-icon-box vm-icon-yellow">🧩</div>
+                <div class="vm-metric-label">Registros similares</div>
+                <div class="vm-metric-value">@(ViewBag.RegistrosSimilares ?? 0)</div>
+                <p class="vm-metric-help">Registros detectados como similares o duplicados.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <h4 class="vm-section-title mt-5">Métricas adicionales sugeridas</h4>
+
+    <div class="row g-4">
+
+        <div class="col-lg-4 col-md-6">
+            <div class="vm-metric-card info">
+                <div class="vm-icon-box vm-icon-cyan">⚙️</div>
+                <div class="vm-metric-label">Tiempo generación embedding</div>
+                <div class="vm-metric-value">@(ViewBag.TiempoPromedioEmbedding ?? 0)</div>
+                <p class="vm-metric-help">Tiempo promedio para convertir texto en vector, en ms.</p>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+            <div class="vm-metric-card purple">
+                <div class="vm-icon-box vm-icon-purple">🔗</div>
+                <div class="vm-metric-label">Similitud semántica promedio</div>
+                <div class="vm-metric-value">@(ViewBag.PromedioSimilitudResultados ?? 0)</div>
+                <p class="vm-metric-help">Promedio de similitud en resultados recuperados.</p>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-12">
+            <div class="vm-metric-card success">
+                <div class="vm-icon-box vm-icon-green">🟢</div>
+                <div class="vm-metric-label">Servicios monitoreados</div>
+                <div class="vm-metric-value">@CountItems(ViewBag.EstadoServicios)</div>
+                <p class="vm-metric-help">Disponibilidad de Supabase, API, OpenAI o n8n.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row g-4 mt-2">
+
+        <div class="col-lg-6">
+            <div class="vm-panel">
+                <h5>Registros por usuario</h5>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Rol</th>
+                                <th>Total registros</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.RegistrosPorUsuario != null && CountItems(ViewBag.RegistrosPorUsuario) > 0)
+                            {
+                                foreach (var item in (IEnumerable)ViewBag.RegistrosPorUsuario)
+                                {
+                                    <tr>
+                                        <td>@GetText(item, "Usuario")</td>
+                                        <td>@GetText(item, "Rol")</td>
+                                        <td>@GetText(item, "TotalRegistros")</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="3" class="text-muted">No existen datos registrados.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="vm-panel">
+                <h5>Consultas por tipo de usuario</h5>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Tipo de usuario</th>
+                                <th>Total consultas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.ConsultasPorTipoUsuario != null && CountItems(ViewBag.ConsultasPorTipoUsuario) > 0)
+                            {
+                                foreach (var item in (IEnumerable)ViewBag.ConsultasPorTipoUsuario)
+                                {
+                                    <tr>
+                                        <td>@GetText(item, "TipoUsuario")</td>
+                                        <td>@GetText(item, "TotalConsultas")</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="2" class="text-muted">No existen consultas registradas.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row g-4 mt-2">
+
+        <div class="col-lg-6">
+            <div class="vm-panel">
+                <h5>Intentos fallidos por usuario</h5>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Total errores</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.IntentosFallidosPorUsuario != null && CountItems(ViewBag.IntentosFallidosPorUsuario) > 0)
+                            {
+                                foreach (var item in (IEnumerable)ViewBag.IntentosFallidosPorUsuario)
+                                {
+                                    <tr>
+                                        <td>@GetText(item, "Usuario")</td>
+                                        <td>@GetText(item, "TotalErrores")</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="2" class="text-muted">No existen errores registrados.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="vm-panel">
+                <h5>Top 5 términos consultados</h5>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Término</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.TopTerminosConsultados != null && CountItems(ViewBag.TopTerminosConsultados) > 0)
+                            {
+                                foreach (var item in (IEnumerable)ViewBag.TopTerminosConsultados)
+                                {
+                                    <tr>
+                                        <td>@GetText(item, "Termino")</td>
+                                        <td>@GetText(item, "Cantidad")</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="2" class="text-muted">No existen términos consultados.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row g-4 mt-2">
+
+        <div class="col-lg-6">
+            <div class="vm-panel">
+                <h5>Registros por fecha</h5>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Total registros</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.RegistrosPorFecha != null && CountItems(ViewBag.RegistrosPorFecha) > 0)
+                            {
+                                foreach (var item in (IEnumerable)ViewBag.RegistrosPorFecha)
+                                {
+                                    <tr>
+                                        <td>@GetDateText(item, "Fecha")</td>
+                                        <td>@GetText(item, "TotalRegistros")</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="2" class="text-muted">No existen registros por fecha.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="vm-panel">
+                <h5>Estado de disponibilidad del servicio</h5>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Servicio</th>
+                                <th>Estado</th>
+                                <th>Mensaje</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.EstadoServicios != null && CountItems(ViewBag.EstadoServicios) > 0)
+                            {
+                                foreach (var item in (IEnumerable)ViewBag.EstadoServicios)
+                                {
+                                    var estado = GetText(item, "Estado");
+
+                                    <tr>
+                                        <td>@GetText(item, "Servicio")</td>
+                                        <td>
+                                            @if (estado == "Activo")
+                                            {
+                                                <span class="badge bg-success">Activo</span>
+                                            }
+                                            else if (estado == "Error")
+                                            {
+                                                <span class="badge bg-danger">Error</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning text-dark">@estado</span>
+                                            }
+                                        </td>
+                                        <td>@GetText(item, "Mensaje")</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="3" class="text-muted">
+                                        Aún no existen servicios registrados.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </div>
 
@@ -429,6 +801,7 @@
 
     <div class="vm-note">
         <strong>Nota:</strong> Este panel permite evidenciar métricas solicitadas en el proyecto, como registros,
-        errores, latencia, consultas al agente, tasa de éxito y uso de almacenamiento vectorial.
+        errores, latencia, consultas al agente, tasa de éxito, uso de almacenamiento vectorial,
+        métricas adicionales de embeddings, similitud semántica, actividad por usuario y estado de servicios.
     </div>
 </div>

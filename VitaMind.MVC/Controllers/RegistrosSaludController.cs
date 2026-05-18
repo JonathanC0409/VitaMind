@@ -54,6 +54,140 @@ namespace VitaMind.MVC.Controllers
             return View();
         }
 
+        /*  CREATE CEPEDA
+         * [HttpPost]
+         public async Task<IActionResult> Create(RegistroSalud registro)
+         {
+             Guid? idUsuario = null;
+
+             try
+             {
+                 var rol = HttpContext.Session.GetString("Rol");
+
+                 if (rol != "Cliente")
+                 {
+                     RegistrarError(
+                         null,
+                         "Rol",
+                         "Acceso no autorizado",
+                         "El usuario intentó registrar información sin rol de Cliente.",
+                         $"Rol recibido: {rol}"
+                     );
+
+                     return RedirectToAction("Login", "Auth");
+                 }
+
+                 var idUsuarioSesion = HttpContext.Session.GetString("IdUsuario");
+
+                 if (string.IsNullOrEmpty(idUsuarioSesion))
+                 {
+                     RegistrarError(
+                         null,
+                         "IdUsuario",
+                         "Sesión inválida",
+                         "No se encontró el IdUsuario en la sesión.",
+                         "IdUsuario vacío o nulo"
+                     );
+
+                     return RedirectToAction("Login", "Auth");
+                 }
+
+                 idUsuario = Guid.Parse(idUsuarioSesion);
+                 registro.IdUsuario = idUsuario.Value;
+
+                 if (string.IsNullOrWhiteSpace(registro.Categoria))
+                 {
+                     RegistrarError(
+                         idUsuario,
+                         "Categoria",
+                         "Campo obligatorio",
+                         "La categoría del registro no puede estar vacía.",
+                         $"Descripcion: {registro.Descripcion}, Intensidad: {registro.Intensidad}, Observacion: {registro.Observacion}"
+                     );
+
+                     ViewBag.Error = "Debe seleccionar una categoría.";
+                     return View(registro);
+                 }
+
+                 if (string.IsNullOrWhiteSpace(registro.Descripcion))
+                 {
+                     RegistrarError(
+                         idUsuario,
+                         "Descripcion",
+                         "Campo obligatorio",
+                         "La descripción del registro no puede estar vacía.",
+                         $"Categoria: {registro.Categoria}, Intensidad: {registro.Intensidad}, Observacion: {registro.Observacion}"
+                     );
+
+                     ViewBag.Error = "Debe ingresar una descripción.";
+                     return View(registro);
+                 }
+
+                 if (registro.Descripcion.Length < 5)
+                 {
+                     RegistrarError(
+                         idUsuario,
+                         "Descripcion",
+                         "Dato inválido",
+                         "La descripción ingresada es demasiado corta.",
+                         $"Descripcion: {registro.Descripcion}"
+                     );
+
+                     ViewBag.Error = "La descripción debe tener al menos 5 caracteres.";
+                     return View(registro);
+                 }
+
+                 var client = _httpClientFactory.CreateClient();
+
+                 var url = "http://localhost:5678/webhook-test/insertar-registro-salud";
+
+                 var datos = new
+                 {
+                     IdUsuario = registro.IdUsuario,
+                     Categoria = registro.Categoria,
+                     Descripcion = registro.Descripcion,
+                     Intensidad = registro.Intensidad,
+                     Observacion = registro.Observacion,
+                     TipoEntrada = "Formulario"
+                 };
+
+                 var response = await client.PostAsJsonAsync(url, datos);
+
+                 if (response.IsSuccessStatusCode)
+                 {
+                     TempData["Mensaje"] = "Registro guardado correctamente con n8n y embedding.";
+                     return RedirectToAction("Index");
+                 }
+
+                 var errorN8n = await response.Content.ReadAsStringAsync();
+
+                 RegistrarError(
+                     idUsuario,
+                     "n8n",
+                     "Error de inserción",
+                     "n8n devolvió un error al intentar insertar el registro.",
+                     errorN8n
+                 );
+
+                 ViewBag.Error = "Error al guardar en n8n: " + errorN8n;
+                 return View(registro);
+             }
+             catch (Exception ex)
+             {
+                 RegistrarError(
+                     idUsuario,
+                     "Sistema",
+                     "Excepción",
+                     ex.Message,
+                     $"Categoria: {registro.Categoria}, Descripcion: {registro.Descripcion}, Intensidad: {registro.Intensidad}, Observacion: {registro.Observacion}"
+                 );
+
+                 ViewBag.Error = "Ocurrió un error al registrar la información: " + ex.Message;
+                 return View(registro);
+             }
+         }*/
+
+        //CREATE ANDERSON
         [HttpPost]
         public async Task<IActionResult> Create(RegistroSalud registro)
         {
@@ -138,8 +272,6 @@ namespace VitaMind.MVC.Controllers
 
                 var client = _httpClientFactory.CreateClient();
 
-                var url = "http://localhost:5678/webhook-test/insertar-registro-salud";
-
                 var datos = new
                 {
                     IdUsuario = registro.IdUsuario,
@@ -150,25 +282,79 @@ namespace VitaMind.MVC.Controllers
                     TipoEntrada = "Formulario"
                 };
 
-                var response = await client.PostAsJsonAsync(url, datos);
+                // ============================================================
+                // 1. INTENTAR GUARDAR MEDIANTE N8N
+                // ============================================================
 
-                if (response.IsSuccessStatusCode)
+                try
                 {
-                    TempData["Mensaje"] = "Registro guardado correctamente con n8n y embedding.";
+                    var urlN8n = "http://localhost:5678/webhook-test/insertar-registro-salud";
+
+                    var responseN8n = await client.PostAsJsonAsync(urlN8n, datos);
+
+                    if (responseN8n.IsSuccessStatusCode)
+                    {
+                        TempData["Mensaje"] = "Registro guardado correctamente con n8n y embedding.";
+                        return RedirectToAction("Index");
+                    }
+
+                    var errorN8n = await responseN8n.Content.ReadAsStringAsync();
+
+                    RegistrarError(
+                        idUsuario,
+                        "n8n",
+                        "Error de inserción",
+                        "n8n devolvió un error al intentar insertar el registro.",
+                        errorN8n
+                    );
+                }
+                catch (Exception exN8n)
+                {
+                    RegistrarError(
+                        idUsuario,
+                        "n8n",
+                        "Servicio no disponible",
+                        "No se pudo conectar con n8n. Se intentará guardar directamente en la API.",
+                        exN8n.Message
+                    );
+                }
+
+                // ============================================================
+                // 2. RESPALDO: GUARDAR DIRECTAMENTE EN LA API
+                // ============================================================
+
+                var registroApi = new RegistroSalud
+                {
+                    IdRegistro = Guid.NewGuid(),
+                    IdUsuario = registro.IdUsuario,
+                    Categoria = registro.Categoria,
+                    Descripcion = registro.Descripcion,
+                    Intensidad = registro.Intensidad,
+                    Observacion = registro.Observacion,
+                    TipoEntrada = "Formulario"
+                };
+
+                var urlApi = "https://localhost:7042/api/RegistrosSalud";
+
+                var responseApi = await client.PostAsJsonAsync(urlApi, registroApi);
+
+                if (responseApi.IsSuccessStatusCode)
+                {
+                    TempData["Mensaje"] = "Registro guardado directamente en la API porque n8n no estaba disponible.";
                     return RedirectToAction("Index");
                 }
 
-                var errorN8n = await response.Content.ReadAsStringAsync();
+                var errorApi = await responseApi.Content.ReadAsStringAsync();
 
                 RegistrarError(
                     idUsuario,
-                    "n8n",
+                    "API",
                     "Error de inserción",
-                    "n8n devolvió un error al intentar insertar el registro.",
-                    errorN8n
+                    "La API no pudo guardar el registro después de fallar n8n.",
+                    errorApi
                 );
 
-                ViewBag.Error = "Error al guardar en n8n: " + errorN8n;
+                ViewBag.Error = "No se pudo guardar el registro ni por n8n ni por la API.";
                 return View(registro);
             }
             catch (Exception ex)

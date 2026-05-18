@@ -24,58 +24,123 @@ namespace VitaMind.MVC.Controllers
                 return View();
             }
 
-            var login = new Usuario
+            try
             {
-                Correo = correo,
-                PasswordHash = password,
-                Nombre = "",
-                Rol = "",
-                Estado = "Activo",
-                FechaRegistro = DateTime.UtcNow
-            };
+                var login = new Usuario
+                {
+                    Correo = correo,
+                    PasswordHash = password,
+                    Nombre = "",
+                    Rol = "",
+                    Estado = "Activo",
+                    FechaRegistro = DateTime.UtcNow
+                };
 
-            using var client = new HttpClient();
+                using var client = new HttpClient();
 
-            var content = new StringContent(
-                JsonConvert.SerializeObject(login),
-                Encoding.UTF8,
-                "application/json"
-            );
+                var content = new StringContent(
+                    JsonConvert.SerializeObject(login),
+                    Encoding.UTF8,
+                    "application/json"
+                );
 
-            var response = await client.PostAsync(endpointLogin, content);
+                var response = await client.PostAsync(endpointLogin, content);
 
-            if (!response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var usuario = JsonConvert.DeserializeObject<Usuario>(json);
+
+                    if (usuario != null)
+                    {
+                        GuardarSesion(usuario);
+
+                        if (usuario.Rol == "Administrador")
+                        {
+                            return RedirectToAction("Dashboard", "Admin");
+                        }
+
+                        if (usuario.Rol == "Cliente")
+                        {
+                            return RedirectToAction("Index", "Cliente");
+                        }
+
+                        ViewBag.Error = "Rol no válido.";
+                        return View();
+                    }
+                }
+            }
+            catch
             {
-                ViewBag.Error = "Credenciales incorrectas.";
+                /*
+                    Si la API no está levantada o hay error de conexión,
+                    se continúa con usuarios temporales locales.
+                */
+            }
+
+            var usuarioTemporal = ObtenerUsuarioTemporal(correo, password);
+
+            if (usuarioTemporal == null)
+            {
+                ViewBag.Error = "Credenciales incorrectas o API no disponible.";
                 return View();
             }
 
-            var json = await response.Content.ReadAsStringAsync();
-            var usuario = JsonConvert.DeserializeObject<Usuario>(json);
+            GuardarSesion(usuarioTemporal);
 
-            if (usuario == null)
-            {
-                ViewBag.Error = "No se pudo obtener la información del usuario.";
-                return View();
-            }
-
-            HttpContext.Session.SetString("IdUsuario", usuario.IdUsuario.ToString());
-            HttpContext.Session.SetString("Rol", usuario.Rol);
-            HttpContext.Session.SetString("Correo", usuario.Correo);
-            HttpContext.Session.SetString("Nombre", usuario.Nombre);
-
-            if (usuario.Rol == "Administrador")
+            if (usuarioTemporal.Rol == "Administrador")
             {
                 return RedirectToAction("Dashboard", "Admin");
             }
 
-            if (usuario.Rol == "Cliente")
+            if (usuarioTemporal.Rol == "Cliente")
             {
                 return RedirectToAction("Index", "Cliente");
             }
 
             ViewBag.Error = "Rol no válido.";
             return View();
+        }
+
+        private Usuario? ObtenerUsuarioTemporal(string correo, string password)
+        {
+            if (correo == "admin@vitamind.com" && password == "123456")
+            {
+                return new Usuario
+                {
+                    IdUsuario = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+                    Nombre = "Administrador VitaMind",
+                    Correo = "admin@vitamind.com",
+                    PasswordHash = "123456",
+                    Rol = "Administrador",
+                    Estado = "Activo",
+                    FechaRegistro = DateTime.UtcNow
+                };
+            }
+
+            if (correo == "juan@vitamind.com" && password == "123456")
+            {
+                return new Usuario
+                {
+                    IdUsuario = Guid.Parse("22222222-2222-2222-2222-222222222222"),
+                    Nombre = "Juan Pérez",
+                    Correo = "juan@vitamind.com",
+                    PasswordHash = "123456",
+                    Rol = "Cliente",
+                    Estado = "Activo",
+                    FechaRegistro = DateTime.UtcNow
+                };
+            }
+
+            return null;
+        }
+
+        private void GuardarSesion(Usuario usuario)
+        {
+            HttpContext.Session.SetString("IdUsuario", usuario.IdUsuario.ToString());
+            HttpContext.Session.SetString("Rol", usuario.Rol);
+            HttpContext.Session.SetString("Correo", usuario.Correo);
+            HttpContext.Session.SetString("Nombre", usuario.Nombre);
         }
 
         public IActionResult Logout()

@@ -9,7 +9,6 @@ using VitaMind.Models;
 using System.Diagnostics;
 using Pgvector;
 
-
 namespace VitaMind.Apii.Controllers
 {
     [Route("api/[controller]")]
@@ -78,7 +77,6 @@ namespace VitaMind.Apii.Controllers
         }
 
         // PUT: api/RegistrosSalud/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutRegistroSalud(Guid id, RegistroSalud registroSalud)
         {
@@ -113,7 +111,6 @@ namespace VitaMind.Apii.Controllers
         }
 
         // POST: api/RegistrosSalud
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<RegistroSalud>> PostRegistroSalud(RegistroSalud registroSalud)
         {
@@ -193,7 +190,25 @@ namespace VitaMind.Apii.Controllers
                 relojTotal.Stop();
                 registroSalud.LatenciaMs = (int)relojTotal.ElapsedMilliseconds;
 
+                // ==============================
+                // 4. GUARDAR REGISTRO + LOG
+                // ==============================
                 _context.RegistrosSalud.Add(registroSalud);
+
+                var log = new LogOperacion
+                {
+                    IdLog = Guid.NewGuid(),
+                    IdUsuario = registroSalud.IdUsuario,
+                    TipoOperacion = "Registro de salud",
+                    Descripcion = $"El usuario registró información en la categoría {registroSalud.Categoria}.",
+                    Estado = "Exitoso",
+                    TiempoRespuestaMs = registroSalud.LatenciaMs,
+                    Origen = "Formulario cliente / API RegistrosSalud",
+                    FechaHora = DateTime.UtcNow
+                };
+
+                _context.LogOperaciones.Add(log);
+
                 await _context.SaveChangesAsync();
 
                 return CreatedAtAction(
@@ -264,6 +279,7 @@ namespace VitaMind.Apii.Controllers
         public async Task<IActionResult> DeleteRegistroSalud(Guid id)
         {
             var registroSalud = await _context.RegistrosSalud.FindAsync(id);
+
             if (registroSalud == null)
             {
                 return NotFound();
