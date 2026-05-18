@@ -152,6 +152,15 @@ namespace VitaMind.MVC.Controllers
                     similitudPromedio
                 );
 
+                RegistrarLog(
+    idUsuario,
+    "Consulta al agente",
+    $"Falló la consulta al agente. Pregunta: {pregunta}",
+    "Fallida",
+    (int)reloj.ElapsedMilliseconds,
+    "MVC/Chatbot"
+);
+
                 ViewBag.Pregunta = pregunta;
                 ViewBag.Respuesta = respuestaTexto;
                 ViewBag.TiempoConsultaMs = tiempoConsulta;
@@ -184,6 +193,15 @@ namespace VitaMind.MVC.Controllers
                         0,
                         0
                     );
+
+                    RegistrarLog(
+    idUsuario,
+    "Consulta al agente",
+    $"Falló la consulta al agente. Pregunta: {pregunta}",
+    "Fallida",
+    (int)reloj.ElapsedMilliseconds,
+    "MVC/Chatbot"
+);
                 }
 
                 ViewBag.Pregunta = pregunta;
@@ -203,6 +221,7 @@ namespace VitaMind.MVC.Controllers
             int registrosRecuperados,
             decimal similitudPromedio)
         {
+
             try
             {
                 var consulta = new ConsultaAgente
@@ -247,6 +266,30 @@ namespace VitaMind.MVC.Controllers
             catch
             {
                 // Evita que falle la aplicación si no se puede registrar el error.
+            }
+        }
+
+        private void RegistrarLog(Guid? idUsuario, string tipoOperacion, string descripcion, string estado, int tiempoMs, string origen)
+        {
+            try
+            {
+                var log = new LogOperacion
+                {
+                    IdLog = Guid.NewGuid(),
+                    IdUsuario = idUsuario,
+                    TipoOperacion = tipoOperacion,
+                    Descripcion = descripcion,
+                    Estado = estado,
+                    TiempoRespuestaMs = tiempoMs,
+                    Origen = origen,
+                    FechaHora = DateTime.UtcNow
+                };
+
+                CRUD<LogOperacion>.Create(log);
+            }
+            catch
+            {
+                // Evita que un error al guardar log rompa el chatbot.
             }
         }
     }

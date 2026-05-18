@@ -2,6 +2,8 @@
 using Newtonsoft.Json;
 using System.Text;
 using VitaMind.Models;
+using ConsumeCRUD;
+using System.Diagnostics;
 
 namespace VitaMind.MVC.Controllers
 {
@@ -55,6 +57,15 @@ namespace VitaMind.MVC.Controllers
                     {
                         GuardarSesion(usuario);
 
+                        RegistrarLog(
+    usuario.IdUsuario,
+    "Inicio de sesión",
+    $"El usuario {usuario.Correo} inició sesión como {usuario.Rol}.",
+    "Exitosa",
+    0,
+    "MVC/Auth"
+);
+
                         if (usuario.Rol == "Administrador")
                         {
                             return RedirectToAction("Dashboard", "Admin");
@@ -77,62 +88,34 @@ namespace VitaMind.MVC.Controllers
                     se continúa con usuarios temporales locales.
                 */
             }
-
-            var usuarioTemporal = ObtenerUsuarioTemporal(correo, password);
-
-            if (usuarioTemporal == null)
-            {
-                ViewBag.Error = "Credenciales incorrectas o API no disponible.";
-                return View();
-            }
-
-            GuardarSesion(usuarioTemporal);
-
-            if (usuarioTemporal.Rol == "Administrador")
-            {
-                return RedirectToAction("Dashboard", "Admin");
-            }
-
-            if (usuarioTemporal.Rol == "Cliente")
-            {
-                return RedirectToAction("Index", "Cliente");
-            }
-
+    
             ViewBag.Error = "Rol no válido.";
             return View();
         }
 
-        private Usuario? ObtenerUsuarioTemporal(string correo, string password)
+
+        private void RegistrarLog(Guid? idUsuario, string tipoOperacion, string descripcion, string estado, int tiempoMs, string origen)
         {
-            if (correo == "admin@vitamind.com" && password == "123456")
+            try
             {
-                return new Usuario
+                var log = new LogOperacion
                 {
-                    IdUsuario = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                    Nombre = "Administrador VitaMind",
-                    Correo = "admin@vitamind.com",
-                    PasswordHash = "123456",
-                    Rol = "Administrador",
-                    Estado = "Activo",
-                    FechaRegistro = DateTime.UtcNow
+                    IdLog = Guid.NewGuid(),
+                    IdUsuario = idUsuario,
+                    TipoOperacion = tipoOperacion,
+                    Descripcion = descripcion,
+                    Estado = estado,
+                    TiempoRespuestaMs = tiempoMs,
+                    Origen = origen,
+                    FechaHora = DateTime.UtcNow
                 };
-            }
 
-            if (correo == "juan@vitamind.com" && password == "123456")
+                CRUD<LogOperacion>.Create(log);
+            }
+            catch
             {
-                return new Usuario
-                {
-                    IdUsuario = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                    Nombre = "Juan Pérez",
-                    Correo = "juan@vitamind.com",
-                    PasswordHash = "123456",
-                    Rol = "Cliente",
-                    Estado = "Activo",
-                    FechaRegistro = DateTime.UtcNow
-                };
+                // Evita que un error de log rompa el login.
             }
-
-            return null;
         }
 
         private void GuardarSesion(Usuario usuario)
